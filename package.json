@@ -1,0 +1,23 @@
+{
+  "name": "ase-thesis-preliminary",
+  "version": "1.0.0",
+  "description": "Thesis practical project",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/codepadawan93/ase-thesis-preliminary.git"
+  },
+  "author": "codepadawan93",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/codepadawan93/ase-thesis-preliminary/issues"
+  },
+  "homepage": "https://github.com/codepadawan93/ase-thesis-preliminary#readme",
+  "dependencies": {
+    "chalk": "^2.4.1",
+    "rivescript": "^2.0.0-alpha.6"
+  }
+}
