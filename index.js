@@ -1,32 +1,30 @@
-const ReadLine = require('readline');
-const Chalk = require('chalk');
-const RiveScript = require('rivescript');
+const Bot = require('./Bot/bot');
 const Express = require('express');
-
+  
 const server = Express();
 
-const bot = new RiveScript();
-const rl = new ReadLine.createInterface({
-    input: process.stdin,
-    output: process.stdout
+const serverOptions = {
+    dotfiles: 'ignore',
+    etag: false,
+    extensions: ['htm', 'html'],
+    index: false,
+    maxAge: '1d',
+    redirect: false,
+    setHeaders: function (res, path, stat) {
+        res.set('x-timestamp', Date.now())
+    }
+};
+
+server.use(Express.static('public', serverOptions));
+
+const bot = new Bot({file:'./training-data.rive'});
+
+server.get('/', function(req, res){
+    bot.ask("d")
+        .then(replyText => {
+            res.send(replyText);
+        })
+        .catch(err => console.error(err));
 });
-
-bot
-    .loadFile('./training-data.rive')
-    .then(function(){
-        bot.sortReplies();
-        ask();
-    })
-    .catch(err=>console.error(err));
-
-let ask = function(){
-    rl.question("You: ", msg => {
-        bot
-            .reply('local-user', msg)
-            .then(reply => {
-                console.log(Chalk.green("Bot: " + reply));
-                ask();
-            })
-            .catch(err=>console.error(err))
-    });
-}
+  
+server.listen(process.env.port || 8080);
