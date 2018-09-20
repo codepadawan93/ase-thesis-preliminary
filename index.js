@@ -1,6 +1,9 @@
 const ReadLine = require('readline');
 const Chalk = require('chalk');
 const RiveScript = require('rivescript');
+const Express = require('express');
+
+const server = Express();
 
 const bot = new RiveScript();
 const rl = new ReadLine.createInterface({
@@ -21,7 +24,7 @@ let ask = function(){
         bot
             .reply('local-user', msg)
             .then(reply => {
-                console.log(Chalk.red("Bot: " + reply));
+                console.log(Chalk.green("Bot: " + reply));
                 ask();
             })
             .catch(err=>console.error(err))

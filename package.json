@@ -18,6 +18,7 @@
   "homepage": "https://github.com/codepadawan93/ase-thesis-preliminary#readme",
   "dependencies": {
     "chalk": "^2.4.1",
+    "express": "^4.16.3",
     "rivescript": "^2.0.0-alpha.6"
   }
 }
