@@ -6,7 +6,7 @@ const server = Express();
 const serverOptions = {
     dotfiles: 'ignore',
     etag: false,
-    extensions: ['htm', 'html'],
+    extensions: [],
     index: false,
     maxAge: '1d',
     redirect: false,
@@ -17,11 +17,11 @@ const serverOptions = {
 
 server.use(Express.static('public', serverOptions));
 
-const bot = new Bot({file:'./training-data.rive'});
+let bot = new Bot({file:'./training-data.rive'});
 
 server.get('/', function(req, res){
-    bot.ask("d")
-        .then(replyText => {
+    bot.ask(req.query.q)
+        .then(function(replyText){
             res.send(replyText);
         })
         .catch(err => console.error(err));
