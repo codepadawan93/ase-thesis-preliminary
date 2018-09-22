@@ -2,20 +2,21 @@ const RiveScript = require('rivescript');
 
 function Bot(config){
 
-    if(!config || !config.file) throw new Error("Error reading config object.");
+    if(!config || !config.file || !config.defaultUser) throw new Error("Error reading config object.");
     
-    this.riveScriptInterpreter = new RiveScript();
+    const riveScriptInterpreter = new RiveScript({
+        utf8: true
+    });
     
-    let proxy = this;
-    this.riveScriptInterpreter
+    riveScriptInterpreter
         .loadFile(config.file)
-        .then(function(){
-            proxy.riveScriptInterpreter.sortReplies();
+        .then(() => {
+            riveScriptInterpreter.sortReplies();
         })
         .catch(err => console.error(err));
-        
-    this.ask = function(message){
-        return this.riveScriptInterpreter.reply(message);
+
+    this.ask = (message) => {
+        return riveScriptInterpreter.reply(config.defaultUser, message);
     };
 };
 

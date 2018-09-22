@@ -10,19 +10,22 @@ const serverOptions = {
     index: false,
     maxAge: '1d',
     redirect: false,
-    setHeaders: function (res, path, stat) {
+    setHeaders: (res, path, stat) => {
         res.set('x-timestamp', Date.now())
     }
 };
 
 server.use(Express.static('public', serverOptions));
 
-let bot = new Bot({file:'./training-data.rive'});
+let bot = new Bot({
+    file: './training-data.rive',
+    defaultUser: 'localuser'
+});
 
-server.get('/', function(req, res){
-    bot.ask(req.query.q)
-        .then(function(replyText){
-            res.send(replyText);
+server.get('/:message', (req, res) => {
+    bot.ask(req.params.message)
+        .then((reply) => {
+            res.send(reply);
         })
         .catch(err => console.error(err));
 });
