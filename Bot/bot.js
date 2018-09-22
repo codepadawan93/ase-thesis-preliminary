@@ -15,8 +15,8 @@ function Bot(config){
         })
         .catch(err => console.error(err));
 
-    this.ask = (message) => {
-        return riveScriptInterpreter.reply(config.defaultUser, message);
+    this.ask = (message, user) => {
+        return riveScriptInterpreter.reply(user || config.defaultUser, message);
     };
 };
 
