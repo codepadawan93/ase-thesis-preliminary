@@ -67,8 +67,10 @@ server.get('/webhook', (req, res) => {
             res.status(200).send(challenge);
         } else {
             // Responds with '403 Forbidden' if verify tokens do not match
-            res.sendStatus(403);      
+            res.sendStatus(403);
         }
+    } else {
+        res.sendStatus(403);
     }
 });
 
@@ -130,9 +132,9 @@ function handlePostback(sender_psid, received_postback) {
   
     // Set the response based on the postback payload
     if (payload === 'yes') {
-      response = { "text": "Thanks!" }
+        response = { "text": "Thanks!" }
     } else if (payload === 'no') {
-      response = { "text": "Oops, try sending another image." }
+        response = { "text": "Oops, try sending another image." }
     }
     // Send the message to acknowledge the postback
     callSendAPI(sender_psid, response);
@@ -167,8 +169,8 @@ function callSendAPI(sender_psid, response) {
 }
 
 server.get([
-    '/',
-    '/:message',
+        '/api',
+        '/api/:message'
     ], (req, res) => {
         bot.ask(req.params.message)
             .then( reply => {
@@ -176,5 +178,9 @@ server.get([
             })
             .catch( err => console.error(err));
 });
-  
+
+server.get('/', (req, res) => {
+    res.status(200).sendFile(path.join(__dirname + '/Static/index.html'));
+})
+
 server.listen(process.env.PORT || 8080, () => console.log('Server has started'));
