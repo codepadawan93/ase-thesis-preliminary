@@ -2,12 +2,15 @@
 
 const Bot = require('./Bot/bot');
 const Express = require('express');
-const request = require("request");
 const bodyParser = require('body-parser');
+
+const request = require('request');
+const path = require('path');
 
 const server = Express();
 
 server.use(bodyParser.json());
+server.use(Express.static('./Static'))
 
 let bot = new Bot({
     file: './training-data.rive',
@@ -178,9 +181,5 @@ server.get([
             })
             .catch( err => console.error(err));
 });
-
-server.get('/', (req, res) => {
-    res.status(200).sendFile(path.join(__dirname + '/Static/index.html'));
-})
 
 server.listen(process.env.PORT || 8080, () => console.log('Server has started'));
