@@ -19,6 +19,7 @@
   "dependencies": {
     "chalk": "^2.4.1",
     "express": "^4.16.3",
+    "request": "^2.88.0",
     "rivescript": "^2.0.0-alpha.6"
   }
 }
