@@ -105,15 +105,15 @@ function sendMessage(recipientId, message) {
     });
 }
 
-// server.get([
-//     '/',
-//     '/:message',
-//     ], (req, res) => {
-//         bot.ask(req.params.message)
-//             .then( reply => {
-//                 res.send(reply);
-//             })
-//             .catch( err => console.error(err));
-// });
+server.get([
+    '/',
+    '/:message',
+    ], (req, res) => {
+        bot.ask(req.params.message)
+            .then( reply => {
+                res.send(reply);
+            })
+            .catch( err => console.error(err));
+});
   
 server.listen(process.env.PORT || 8080, () => console.log('Server has started'));
