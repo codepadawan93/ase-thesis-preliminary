@@ -182,4 +182,6 @@ server.get([
             .catch( err => console.error(err));
 });
 
-server.listen(process.env.PORT || 8080, () => console.log('Server has started'));
+server.listen(process.env.PORT || 8080, function(){ 
+    console.log('Server has started on port ' + this.address().port); 
+});
