@@ -14,24 +14,21 @@ let bot = new Bot({
 });
 
 // FB webhook
-server.post('/webhook', (req, res) => {
-    let body = req.body;
-
-    // Checks this is an event from a page subscription
-    if (body.object === 'page') {
-        // Iterates over each entry - there may be multiple if batched
-        body.entry.forEach(function(entry) {
-            // Gets the message. entry.messaging is an array, but 
-            // will only ever contain one message, so we get index 0
-            let webhook_event = entry.messaging[0];
-            console.log(webhook_event);
+server.post("/webhook", function (req, res) {
+    // Make sure this is a page subscription
+    if (req.body.object == "page") {
+        // Iterate over each entry
+        // There may be multiple entries if batched
+        req.body.entry.forEach(function(entry) {
+        // Iterate over each messaging event
+        entry.messaging.forEach(function(event) {
+            if (event.postback) {
+                processPostback(event);
+            }
+        });
         });
 
-        // Returns a '200 OK' response to all requests
-        res.status(200).send('EVENT_RECEIVED');
-    } else {
-        // Returns a '404 Not Found' if event is not from a page subscription
-        res.sendStatus(404);
+        res.sendStatus(200);
     }
 });
 
@@ -59,15 +56,64 @@ server.get('/webhook', (req, res) => {
     }
 });
 
-server.get([
-    '/',
-    '/:message',
-    ], (req, res) => {
-        bot.ask(req.params.message)
-            .then( reply => {
-                res.send(reply);
-            })
-            .catch( err => console.error(err));
-});
+function processPostback(event) {
+    var senderId = event.sender.id;
+    var payload = event.postback.payload;
+
+    if (payload === "Greeting") {
+        // Get user's first name from the User Profile API
+        // and include it in the greeting
+        request({
+            url: "https://graph.facebook.com/v2.6/" + senderId,
+            qs: {
+                access_token: process.env.PAGE_ACCESS_TOKEN,
+                fields: "first_name"
+            },
+            method: "GET"
+        }, function(error, response, body) {
+            var greeting = "";
+            if (error) {
+                console.log("Error getting user's name: " +  error);
+            } else {
+                var bodyObj = JSON.parse(body);
+                name = bodyObj.first_name;
+                greeting = "Hi " + name + ". ";
+            }
+            var message = greeting + "My name is SP Movie Bot. I can tell you various details regarding movies. What movie would you like to know about?";
+            sendMessage(senderId, {text: message});
+        });
+    }
+}
+
+function sendMessage(recipientId, message) {
+    request({
+        url: "https://graph.facebook.com/v2.6/me/messages",
+        qs: {
+            access_token: process.env.PAGE_ACCESS_TOKEN
+        },
+        method: "POST",
+        json: {
+            recipient: {
+                id: recipientId
+            },
+            message: message,
+        }
+    }, function(error, response, body) {
+        if (error) {
+            console.log("Error sending message: " + response.error);
+        }
+    });
+}
+
+// server.get([
+//     '/',
+//     '/:message',
+//     ], (req, res) => {
+//         bot.ask(req.params.message)
+//             .then( reply => {
+//                 res.send(reply);
+//             })
+//             .catch( err => console.error(err));
+// });
   
 server.listen(process.env.PORT || 8080, () => console.log('Server has started'));
