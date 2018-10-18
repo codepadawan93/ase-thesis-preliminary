@@ -14,14 +14,10 @@ server.use(bodyParser.json());
 server.use(Express.static("./Static"));
 
 let bot = new Bot({
-  file: "./training-data.rive",
+  file: "./RiveScript/training-data.rive",
   defaultUser: "localuser"
 });
 
-/**
- * First handle webhooks
- *
- */
 server.post("/webhook", (req, res) => {
   // Parse the request body from the POST
   let body = req.body;
@@ -41,7 +37,10 @@ server.post("/webhook", (req, res) => {
       // Check if the event is a message or postback and
       // pass the event to the appropriate handler function
       if (webhook_event.message) {
-        handleMessage(sender_psid, webhook_event.message);
+        handleMessage(
+          sender_psid,
+          webhook_event.message + JSON.stringify(webhook_event.sender)
+        );
       } else if (webhook_event.postback) {
         handlePostback(sender_psid, webhook_event.postback);
       }
