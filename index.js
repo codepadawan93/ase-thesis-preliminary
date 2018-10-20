@@ -186,6 +186,7 @@ function callSendAPI(sender_psid, response) {
  */
 server.get(["/api", "/api/:message"], (req, res) => {
   res.set("Content-Type", "application/json");
+  res.set("Access-Control-Allow-Origin", "*");
   bot
     .ask(req.params.message)
     .then(reply => {
