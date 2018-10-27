@@ -193,6 +193,11 @@ server.use(function(req, res, next) {
   next();
 });
 
+// respond to OPTIONS requests with 200
+server.options("*", (req, res) => {
+  res.sendStatus(200);
+});
+
 /**
  * Add HTTP auth
  *
@@ -216,10 +221,6 @@ server.use(basicAuth(basicAuthConfig));
  * Then handle direct requests
  *
  */
-server.options("*", (req, res) => {
-  res.sendStatus(200);
-});
-
 server.get(["/api", "/api/:message"], (req, res) => {
   console.log(req.auth);
   bot
