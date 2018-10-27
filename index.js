@@ -215,7 +215,6 @@ server.use(basicAuth(basicAuthConfig));
  * Then handle direct requests
  *
  */
-server.options(["/"], () => {});
 server.get(["/api", "/api/:message"], (req, res) => {
   bot
     .ask(req.params.message)
