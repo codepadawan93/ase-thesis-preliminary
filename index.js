@@ -189,7 +189,7 @@ function callSendAPI(sender_psid, response) {
  */
 server.use(function(req, res, next) {
   res.set("Content-Type", "application/json");
-  res.set("Access-Control-Allow-Origin", "http://localhost:3000/");
+  res.set("Access-Control-Allow-Origin", "http://localhost:3000");
   next();
 });
 
