@@ -188,11 +188,13 @@ function callSendAPI(sender_psid, response) {
  *
  */
 server.use(function(req, res, next) {
+  let remoteAddress = `${req.headers["x-forwarded-for"] ||
+    req.connection.remoteAddress}`;
+  if (!remoteAddress.contains("https")) {
+    remoteAddress = "https://" + remoteAddress;
+  }
   res.set("Content-Type", "application/json");
-  res.set(
-    "Access-Control-Allow-Origin",
-    `${req.headers["x-forwarded-for"] || req.connection.remoteAddress}`
-  );
+  res.set("Access-Control-Allow-Origin", remoteAddress);
   next();
 });
 
