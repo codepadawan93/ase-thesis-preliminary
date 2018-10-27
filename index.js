@@ -189,7 +189,10 @@ function callSendAPI(sender_psid, response) {
  */
 server.use(function(req, res, next) {
   res.set("Content-Type", "application/json");
-  //res.set("Access-Control-Allow-Origin", "*");
+  res.set(
+    "Access-Control-Allow-Origin",
+    `${req.headers["x-forwarded-for"] || req.connection.remoteAddress}`
+  );
   next();
 });
 
