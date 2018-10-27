@@ -190,7 +190,7 @@ function callSendAPI(sender_psid, response) {
 server.use(function(req, res, next) {
   let remoteAddress = `${req.headers["x-forwarded-for"] ||
     req.connection.remoteAddress}`;
-  if (!remoteAddress.contains("https")) {
+  if (remoteAddress.indexOf("https") == -1) {
     remoteAddress = "https://" + remoteAddress;
   }
   res.set("Content-Type", "application/json");
