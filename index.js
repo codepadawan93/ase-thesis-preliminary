@@ -2,6 +2,7 @@
 
 const Bot = require("./Bot/bot");
 const Express = require("express");
+const basicAuth = require("express-basic-auth");
 const bodyParser = require("body-parser");
 
 const request = require("request");
@@ -18,6 +19,10 @@ let bot = new Bot({
   defaultUser: "localuser"
 });
 
+/**
+ * Handle Facebook integration requests
+ *
+ */
 server.post("/webhook", (req, res) => {
   // Parse the request body from the POST
   let body = req.body;
@@ -179,34 +184,57 @@ function callSendAPI(sender_psid, response) {
 }
 
 /**
+ * Add headers for all responses
+ *
+ */
+server.use(function(req, res, next) {
+  res.set("Content-Type", "application/json");
+  res.set("Access-Control-Allow-Origin", "*");
+  next();
+});
+
+/**
+ * Add HTTP auth
+ *
+ */
+const basicAuthConfig = {
+  users: {},
+  unauthorizedResponse: req => {
+    const res = {
+      success: false,
+      message: "401 unauthorized"
+    };
+    return req.auth ? JSON.stringify(res) : JSON.stringify(res);
+  }
+};
+basicAuthConfig.users[process.env.ADMIN_USERNAME] = process.env.ADMIN_PASSWORD;
+
+server.use(basicAuth(basicAuthConfig));
+
+/**
  * Then handle direct requests
  *
  */
 server.get(["/api", "/api/:message"], (req, res) => {
-  res.set("Content-Type", "application/json");
-  res.set("Access-Control-Allow-Origin", "*");
   bot
     .ask(req.params.message)
     .then(reply => {
-      res.end(
-        JSON.stringify({
-          success: true,
-          type: messageTypes.plain,
-          message: reply
-        })
-      );
+      res.json({
+        success: true,
+        type: messageTypes.plain,
+        message: reply
+      });
     })
     .catch(err => {
       console.error(err);
-      res.end(
-        JSON.stringify({
-          success: false,
-          errorMessage: err
-        })
-      );
+      res.json({
+        success: false,
+        errorMessage: err
+      });
     });
 });
 
+// Start server...
 server.listen(process.env.PORT || 8080, function() {
   console.log("Server has started on port " + this.address().port);
 });
