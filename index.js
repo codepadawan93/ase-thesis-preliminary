@@ -1,5 +1,3 @@
-"use strict";
-
 const Bot = require("./Bot/bot");
 const Express = require("express");
 const basicAuth = require("express-basic-auth");
@@ -162,7 +160,7 @@ function callSendAPI(sender_psid, response) {
     },
     message: response
   };
-  console.log("GOT THIS FAR");
+
   // Send the HTTP request to the Messenger Platform
   request(
     {
@@ -189,12 +187,19 @@ function callSendAPI(sender_psid, response) {
  */
 server.use(function(req, res, next) {
   res.set("Content-Type", "application/json");
-  res.set("Access-Control-Allow-Origin", "*");
+  res.set("Access-Control-Allow-Origin", "http://localhost:3000");
+  res.set("Access-Control-Allow-Headers", "Authorization");
+  res.set("Access-Control-Allow-Credentials", "true");
   next();
 });
 
+// respond to OPTIONS requests with 200
+server.options("*", (req, res) => {
+  res.sendStatus(200);
+});
+
 /**
- * Add HTTP auth
+ * Add HTTP auth and return json if no auth is present
  *
  */
 const basicAuthConfig = {
@@ -204,11 +209,12 @@ const basicAuthConfig = {
       success: false,
       message: "401 unauthorized"
     };
-    return req.auth ? JSON.stringify(res) : JSON.stringify(res);
+    return req.auth || JSON.stringify(res);
   }
 };
-basicAuthConfig.users[process.env.ADMIN_USERNAME] = process.env.ADMIN_PASSWORD;
 
+// Set username/pass fron env variables
+basicAuthConfig.users[process.env.ADMIN_USERNAME] = process.env.ADMIN_PASSWORD;
 server.use(basicAuth(basicAuthConfig));
 
 /**
@@ -216,6 +222,7 @@ server.use(basicAuth(basicAuthConfig));
  *
  */
 server.get(["/api", "/api/:message"], (req, res) => {
+  console.log(req.auth);
   bot
     .ask(req.params.message)
     .then(reply => {
@@ -234,7 +241,7 @@ server.get(["/api", "/api/:message"], (req, res) => {
     });
 });
 
-// Start server...
+// Start server
 server.listen(process.env.PORT || 8080, function() {
   console.log("Server has started on port " + this.address().port);
 });
