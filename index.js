@@ -162,7 +162,7 @@ function callSendAPI(sender_psid, response) {
     },
     message: response
   };
-  console.log("GOT THIS FAR");
+
   // Send the HTTP request to the Messenger Platform
   request(
     {
@@ -201,22 +201,22 @@ server.options("*", (req, res) => {
 });
 
 /**
- * Add HTTP auth
+ * Add HTTP auth and return json if no auth is present
  *
  */
 const basicAuthConfig = {
-  challenge: true,
   users: {},
   unauthorizedResponse: req => {
     const res = {
       success: false,
       message: "401 unauthorized"
     };
-    return req.auth ? JSON.stringify(res) : JSON.stringify(res);
+    return req.auth || JSON.stringify(res);
   }
 };
-basicAuthConfig.users[process.env.ADMIN_USERNAME] = process.env.ADMIN_PASSWORD;
 
+// Set username/pass fron env variables
+basicAuthConfig.users[process.env.ADMIN_USERNAME] = process.env.ADMIN_PASSWORD;
 server.use(basicAuth(basicAuthConfig));
 
 /**
@@ -243,7 +243,7 @@ server.get(["/api", "/api/:message"], (req, res) => {
     });
 });
 
-// Start server...
+// Start server
 server.listen(process.env.PORT || 8080, function() {
   console.log("Server has started on port " + this.address().port);
 });
