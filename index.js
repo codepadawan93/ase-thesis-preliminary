@@ -216,6 +216,10 @@ server.use(basicAuth(basicAuthConfig));
  * Then handle direct requests
  *
  */
+server.options("*", (req, res) => {
+  res.sendStatus(200);
+});
+
 server.get(["/api", "/api/:message"], (req, res) => {
   console.log(req.auth);
   bot
