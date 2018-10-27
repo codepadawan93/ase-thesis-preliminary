@@ -198,6 +198,7 @@ server.use(function(req, res, next) {
  *
  */
 const basicAuthConfig = {
+  challenge: true,
   users: {},
   unauthorizedResponse: req => {
     const res = {
@@ -216,6 +217,7 @@ server.use(basicAuth(basicAuthConfig));
  *
  */
 server.get(["/api", "/api/:message"], (req, res) => {
+  console.log(req.auth);
   bot
     .ask(req.params.message)
     .then(reply => {
