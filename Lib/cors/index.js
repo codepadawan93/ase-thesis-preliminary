@@ -56,7 +56,7 @@ const cors = (req, res, next) => {
     code = 400;
   }
   headers.forEach(header => res.header(header));
-  res.status(code);
+  res.sendStatus(code);
   next();
 };
 
