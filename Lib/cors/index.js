@@ -26,7 +26,11 @@ const cors = (req, res, next) => {
       }
     ];
   } else if (req.method === HTTP.OPTIONS) {
-    console.log(origin);
+    console.log(
+      origin,
+      req.connection.remoteAddress,
+      req.headers["x-forwarded-for"]
+    );
     if (process.env.ALLOWED_DOMAINS.split(", ").indexOf(origin) !== -1) {
       headers = [
         ...headers,
