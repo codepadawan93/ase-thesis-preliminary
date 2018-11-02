@@ -17,25 +17,6 @@ server.use(cors);
 server.use(bodyParser.json());
 server.use(Express.static("./Static"));
 
-/**
- * Add HTTP auth and return json if no auth is present
- *
- */
-const basicAuthConfig = {
-  users: {},
-  unauthorizedResponse: req => {
-    const res = {
-      success: false,
-      message: "401 unauthorized"
-    };
-    return req.auth || JSON.stringify(res);
-  }
-};
-
-// Set username/pass fron env variables
-basicAuthConfig.users[process.env.ADMIN_USERNAME] = process.env.ADMIN_PASSWORD;
-server.use(basicAuth(basicAuthConfig));
-
 let bot = new Bot({
   file: "./RiveScript/training-data.rive",
   defaultUser: "localuser"
@@ -204,6 +185,25 @@ function callSendAPI(sender_psid, response) {
     }
   );
 }
+
+/**
+ * Add HTTP auth and return json if no auth is present
+ *
+ */
+const basicAuthConfig = {
+  users: {},
+  unauthorizedResponse: req => {
+    const res = {
+      success: false,
+      message: "401 unauthorized"
+    };
+    return req.auth || JSON.stringify(res);
+  }
+};
+
+// Set username/pass fron env variables
+basicAuthConfig.users[process.env.ADMIN_USERNAME] = process.env.ADMIN_PASSWORD;
+server.use(basicAuth(basicAuthConfig));
 
 /**
  * Then handle direct requests
