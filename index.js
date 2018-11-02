@@ -12,6 +12,8 @@ const path = require("path");
 const messageTypes = require("./Models/messageTypes");
 const server = Express();
 
+server.use(cors);
+
 server.use(bodyParser.json());
 server.use(Express.static("./Static"));
 
@@ -184,7 +186,7 @@ function callSendAPI(sender_psid, response) {
   );
 }
 
-server.use(cors);
+//server.use(cors);
 
 // /**
 //  * Add headers for all responses
