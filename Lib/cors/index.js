@@ -13,16 +13,16 @@ const cors = (req, res, next) => {
         "Access-Control-Allow-Origin": process.env.ALLOWED_DOMAINS
       },
       {
-        "Access-Control-Allow-Credentials": " true"
+        "Access-Control-Allow-Credentials": "true"
       },
       {
-        "Cache-Control": " no-cache"
+        "Cache-Control": "no-cache"
       },
       {
-        Pragma: " no-cache"
+        Pragma: "no-cache"
       },
       {
-        "Content-Type": " text/plain"
+        "Content-Type": "text/plain"
       }
     ];
   } else if (req.method === HTTP.OPTIONS) {
