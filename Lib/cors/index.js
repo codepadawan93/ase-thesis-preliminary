@@ -4,7 +4,7 @@ const cors = (req, res, next) => {
   let headers = [];
   let code = 200;
 
-  const origin = req.headers.referer;
+  const origin = req.headers.origin || req.headers.referer;
 
   if (req.method === HTTP.GET) {
     headers = [
