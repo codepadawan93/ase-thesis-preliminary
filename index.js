@@ -4,6 +4,7 @@ const Bot = require("./Bot/bot");
 const Express = require("express");
 const basicAuth = require("express-basic-auth");
 const bodyParser = require("body-parser");
+const cors = require("./Lib/cors");
 
 const request = require("request");
 const path = require("path");
@@ -183,22 +184,24 @@ function callSendAPI(sender_psid, response) {
   );
 }
 
-/**
- * Add headers for all responses
- *
- */
-server.use(function(req, res, next) {
-  res.set("Content-Type", "application/json");
-  res.set("Access-Control-Allow-Origin", "http://localhost:3000");
-  res.set("Access-Control-Allow-Headers", "Authorization");
-  res.set("Access-Control-Allow-Credentials", "true");
-  next();
-});
+server.use(cors);
 
-// respond to OPTIONS requests with 200
-server.options("*", (req, res) => {
-  res.sendStatus(200);
-});
+// /**
+//  * Add headers for all responses
+//  *
+//  */
+// server.use(function(req, res, next) {
+//   res.set("Content-Type", "application/json");
+//   res.set("Access-Control-Allow-Origin", "http://localhost:3000");
+//   res.set("Access-Control-Allow-Headers", "Authorization");
+//   res.set("Access-Control-Allow-Credentials", "true");
+//   next();
+// });
+
+// // respond to OPTIONS requests with 200
+// server.options("*", (req, res) => {
+//   res.sendStatus(200);
+// });
 
 /**
  * Add HTTP auth and return json if no auth is present
