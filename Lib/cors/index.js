@@ -48,10 +48,9 @@ const cors = (req, res, next) => {
   } else {
     headers = [...headers, { "Content-Type": "text/plain" }];
     code = 400;
-    res.cookie("pageAccess", "-1", { maxAge: -1 });
   }
   headers.forEach(header => res.header(header));
-  res.status(code);
+  res.sendStatus(code);
   next();
 };
 
