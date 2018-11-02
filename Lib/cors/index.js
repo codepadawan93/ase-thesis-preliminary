@@ -26,7 +26,7 @@ const cors = (req, res, next) => {
     headers = [
       ...headers,
       {
-        "Access-Control-Allow-Origin": "http://arunranga.com"
+        "Access-Control-Allow-Origin": process.env.ALLOWED_DOMAINS
       },
       {
         "Access-Control-Allow-Methods": "GET, OPTIONS"
