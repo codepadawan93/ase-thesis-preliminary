@@ -4,7 +4,7 @@ const cors = (req, res, next) => {
   let headers = [];
   let code = 200;
 
-  const origin = req.headers["x-forwarded-for"] || req.connection.remoteAddress;
+  const origin = req.headers.referer;
 
   if (req.method === HTTP.GET) {
     headers = [
@@ -26,11 +26,6 @@ const cors = (req, res, next) => {
       }
     ];
   } else if (req.method === HTTP.OPTIONS) {
-    console.log(
-      origin,
-      req.connection.remoteAddress,
-      req.headers["x-forwarded-for"]
-    );
     if (process.env.ALLOWED_DOMAINS.split(", ").indexOf(origin) !== -1) {
       headers = [
         ...headers,
