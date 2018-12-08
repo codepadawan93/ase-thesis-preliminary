@@ -10,7 +10,7 @@ const messageTypes = require("./Models/messageTypes");
 const server = Express();
 
 server.use(bodyParser.json());
-server.use(Express.static("./Static"));
+server.use(Express.static("./Static/build"));
 
 let bot = new Bot({
   file: "./RiveScript/training-data.rive",
@@ -239,6 +239,12 @@ server.get(["/api", "/api/:message"], (req, res) => {
         errorMessage: err
       });
     });
+});
+
+// Reroute everything else to client app
+server.get("*", (req, res) => {
+  console.log(res);
+    res.sendFile(path.join(__dirname, "Static/build", "index.html"));
 });
 
 // Start server

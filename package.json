@@ -4,6 +4,10 @@
   "description": "Thesis practical project",
   "main": "index.js",
   "scripts": {
+    "start": "node index.js",
+    "start-dev": "node_modules/.bin/nodemon index.js",
+    "install-client": "cd Static && npm install && exit 0",
+    "build-client": "cd Static && npm run build && exit 0",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -17,10 +21,13 @@
   },
   "homepage": "https://github.com/codepadawan93/ase-thesis-preliminary#readme",
   "dependencies": {
-    "chalk": "^2.4.1",
+    "babel-loader": "^8.0.4",
     "express": "^4.16.3",
     "express-basic-auth": "^1.1.6",
     "request": "^2.88.0",
     "rivescript": "^2.0.0-alpha.6"
+  },
+  "devDependencies": {
+    "nodemon": "^1.18.7"
   }
 }

@@ -1,0 +1,23 @@
+/**
+*   Style overrides for chat box component
+*
+*/
+.sc-launcher{
+    background-color: #007bff !important;
+}
+
+.sc-header{
+    background-color: #007bff !important;
+}
+
+.sc-header--team-name:hover {
+    background: #0069d9 !important;
+}
+
+.sc-header--close-button:hover {
+    background: #0069d9 !important;
+}
+
+.sc-message--content.sent .sc-message--text{
+    background-color: #007bff !important;
+}
