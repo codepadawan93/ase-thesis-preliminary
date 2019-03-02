@@ -81,24 +81,25 @@ server.get("/webhook", (req, res) => {
 });
 
 // Handles messages events
-function handleMessage(sender_psid, received_message) {
+async function handleMessage(sender_psid, received_message) {
   let response;
 
   // Checks if the message contains text
   if (received_message.text) {
-    bot
-      .ask(received_message.text)
-      .then(reply => {
-        // Create the payload for a basic text message, which
-        // will be added to the body of our request to the Send API
-        response = {
-          text: reply
-        };
-        console.log(response);
-        // Send the response message
-        callSendAPI(sender_psid, response);
-      })
-      .catch(err => console.error(err));
+    try {
+      const reply = await bot.ask(received_message.text);
+
+      // Create the payload for a basic text message, which
+      // will be added to the body of our request to the Send API
+      response = {
+        text: reply
+      };
+      console.log(response);
+      // Send the response message
+      callSendAPI(sender_psid, response);
+    } catch (err) {
+      console.error(err);
+    }
   } else if (received_message.attachments) {
     // Get the URL of the message attachment
     let attachment_url = received_message.attachments[0].payload.url;
@@ -221,30 +222,27 @@ server.use(basicAuth(basicAuthConfig));
  * Then handle direct requests
  *
  */
-server.get(["/api", "/api/:message"], (req, res) => {
-  console.log(req.auth);
-  bot
-    .ask(req.params.message)
-    .then(reply => {
-      res.json({
-        success: true,
-        type: messageTypes.plain,
-        message: reply
-      });
-    })
-    .catch(err => {
-      console.error(err);
-      res.json({
-        success: false,
-        errorMessage: err
-      });
+server.get(["/api", "/api/:message"], async (req, res) => {
+  try {
+    const reply = await bot.ask(req.params.message);
+    res.status(200).json({
+      success: true,
+      type: messageTypes.plain,
+      message: reply
     });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      success: false,
+      errorMessage: err
+    });
+  }
 });
 
 // Reroute everything else to client app
 server.get("*", (req, res) => {
   console.log(res);
-    res.sendFile(path.join(__dirname, "Static/build", "index.html"));
+  res.sendFile(path.join(__dirname, "Static/build", "index.html"));
 });
 
 // Start server
