@@ -1,23 +1,28 @@
 const RiveScript = require("rivescript");
 
-function Bot(config) {
-  if (!config || !config.file || !config.defaultUser)
-    throw new Error("Error reading config object.");
+class Bot {
+  constructor(config) {
+    if (!config || !config.file || !config.defaultUser) {
+      throw new Error("Error reading config object.");
+    }
+    this.config = config;
+    this.riveScriptInterpreter = new RiveScript({
+      utf8: true
+    });
 
-  const riveScriptInterpreter = new RiveScript({
-    utf8: true
-  });
-
-  riveScriptInterpreter
-    .loadFile(config.file)
-    .then(() => {
-      riveScriptInterpreter.sortReplies();
-    })
-    .catch(err => console.error(err));
-
-  this.ask = (message, user) => {
-    return riveScriptInterpreter.reply(user || config.defaultUser, message);
-  };
+    this.riveScriptInterpreter
+      .loadFile(this.config.file)
+      .then(() => {
+        this.riveScriptInterpreter.sortReplies();
+      })
+      .catch(err => console.error(err));
+  }
+  ask(message, user) {
+    return this.riveScriptInterpreter.reply(
+      user || this.config.defaultUser,
+      message
+    );
+  }
 }
 
 module.exports = Bot;

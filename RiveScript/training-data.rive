@@ -9,22 +9,22 @@
 ! var master = localuser
 
 // Bot Variables
-! var name     = Aiden
-! var fullname = Aiden Rive
+! var name     = Ionuţ
+! var fullname = Ionuţ Recomandatorul
 ! var age      = 5
 ! var birthday = October 12
 ! var sex      = male
-! var location = Michigan
-! var city     = Detroit
+! var location = Arad
+! var city     = Arad
 ! var eyes     = blue
 ! var hair     = light brown
 ! var hairlen  = short
 ! var color    = blue
-! var band     = Nickelback
+! var band     = Kino
 ! var book     = Myst
-! var author   = Stephen King
+! var author   = HP Lovecraft
 ! var job      = robot
-! var website  = www.rivescript.com
+! var website  = www.github.com
 
 // Substitutions
 ! sub &quot;    = "
@@ -190,10 +190,6 @@
 ! array no         = no nah nope nay
 
 // Learn stuff about our users.
-
-+ my name is *
-- <set name=<formal>>Nice to meet you, <get name>.
-- <set name=<formal>><get name>, nice to meet you.
 
 + my name is <bot master>
 - <set name=<bot master>>That's my master's name too.
@@ -400,8 +396,8 @@
 - How likely, would you estimate?
 
 + (hello|hi|hey|howdy|hola|hai|yo) [*]
-- How do you do. Please state your problem.
-- Hi. What seems to be your problem?
+- How do you do. Please tell me where you'd like to go!
+- Hi. Where would you like to go?
 
 + [*] computer [*]
 - Do computers worry you?
@@ -489,13 +485,6 @@
 - Do you really think so?
 - But you are not sure you <star2>.
 - Do you really doubt you <star2>
-
-+ i am *
-- Is it because you are <star> that you came to me?
-- How long have you been <star>?
-- Do you believe it is normal to be <star>?
-- Do you enjoy being <star>?
-- Do you know anyone else who is <star>?
 
 + i can not *
 - How do you know that you can't <star>?
@@ -625,3 +614,27 @@
 - Does this topic make you feel angry?
 - Is something making you feel angry?
 - Does using that kind of language make you feel better?
+
+// Specialised responses 
++ [*] (vacation|trip|excursion|city break|team building) [*]
+- Placeholder response
+
+// Event responses
+
++ i am *
+- expression.attribution.username=<star>
+
++ my name is *
+- <set name=<formal>>expression.attribution.username=<star>
+
++ [*] (objectives|attractions|landmarks|destinations|places) (in|around|near|nearby|close to) * [*]
+- query.attractions.term=<star3>
+
++ [*] tell me about * [*]
+- query.inform.term=<star1>
+
++ [*] recommend me *
+- query.recommend.term=<star1>
+
++ [*] (show|show me|show a) (a picture|picture|pictures|an image|image|images|an icon|icon|icons) of *
+- query.image.term=<star3>
