@@ -56,7 +56,7 @@ class Engine {
     return this;
   }
 
-  calculateSimilarities() {
+  _calculateSimilarities() {
     let sumSimilarity = 0;
     // Traverse the matrix row by row and calculate similarity with all other rows
     for (let i = 0; i < this.matrix.length; i++) {
@@ -88,6 +88,7 @@ class Engine {
   }
 
   getRecommendationForExisting(userName) {
+    this._calculateSimilarities();
     const allItems = [];
     const attractionIds = new Set();
     if (this.rows.indexOf(userName) === -1) {
@@ -124,7 +125,7 @@ class Engine {
     ratings.userName = "extra-user";
     this.ratings.responses.NEW_KEY = ratings;
     this.fit(this.ratings, this.items)
-      .calculateSimilarities()
+      ._calculateSimilarities()
       .getRecommendationForExisting("extra-user");
     return this;
   }

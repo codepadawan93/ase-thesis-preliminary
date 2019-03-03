@@ -1,4 +1,5 @@
 const Bot = require("./Bot/bot");
+const Recommender = require("./Library/recommender");
 const Express = require("express");
 const basicAuth = require("express-basic-auth");
 const bodyParser = require("body-parser");
@@ -16,6 +17,7 @@ let bot = new Bot({
   file: "./RiveScript/training-data.rive",
   defaultUser: "localuser"
 });
+let recommender = new Recommender();
 
 /**
  * Handle Facebook integration requests
@@ -216,7 +218,7 @@ const basicAuthConfig = {
 
 // Set username/pass fron env variables
 basicAuthConfig.users[process.env.ADMIN_USERNAME] = process.env.ADMIN_PASSWORD;
-// server.use(basicAuth(basicAuthConfig));
+server.use(basicAuth(basicAuthConfig));
 
 /**
  * Then handle direct requests
@@ -224,7 +226,8 @@ basicAuthConfig.users[process.env.ADMIN_USERNAME] = process.env.ADMIN_PASSWORD;
  */
 server.get(["/api", "/api/:message"], async (req, res) => {
   try {
-    const reply = await bot.ask(req.params.message);
+    let reply = await bot.ask(req.params.message);
+    reply = recommender.parse(reply);
     res.status(200).json({
       success: true,
       type: messageTypes.plain,
