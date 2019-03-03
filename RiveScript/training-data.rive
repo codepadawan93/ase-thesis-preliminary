@@ -627,14 +627,30 @@
 + my name is *
 - <set name=<formal>>expression.attribution.username=<star>
 
++ (i|we) would like to go to *
+- query.recommend.term=<star>
+
++ where should (i|we) go
+- query.recommend.all
+
++ suggest (a place|a destination|an attraction)
+- query.recommend.all
+
 + [*] (objectives|attractions|landmarks|destinations|places) (in|around|near|nearby|close to) * [*]
 - query.attractions.term=<star3>
 
 + [*] tell me about * [*]
 - query.inform.term=<star1>
 
++ [*] describe *
+- query.inform.term=<star>
+
++ [*] recommend me *
+- query.recommend.term=<star1>
+
 + [*] recommend me *
 - query.recommend.term=<star1>
 
 + [*] (show|show me|show a) (a picture|picture|pictures|an image|image|images|an icon|icon|icons) of *
 - query.image.term=<star3>
+
