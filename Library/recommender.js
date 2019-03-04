@@ -49,7 +49,10 @@ class Recommender {
     const { recommendations } = this.userName
       ? this.engine.getRecommendationForExisting(this.userName)
       : this.engine.getRecommendationForNew();
-    const recommendationsString = recommendations.map(r => r.name).join("\n");
+    const recommendationsString = recommendations
+      .map(r => r.name)
+      .slice(0, 10)
+      .join("\n");
     return recommendationsString;
   }
 }

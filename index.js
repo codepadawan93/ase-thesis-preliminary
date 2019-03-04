@@ -89,7 +89,8 @@ async function handleMessage(sender_psid, received_message) {
   // Checks if the message contains text
   if (received_message.text) {
     try {
-      const reply = await bot.ask(received_message.text);
+      let reply = await bot.ask(received_message.text);
+      reply = recommender.parse(reply);
 
       // Create the payload for a basic text message, which
       // will be added to the body of our request to the Send API
