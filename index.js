@@ -14,7 +14,7 @@ CredManager.createServiceAccountJson();
 const server = Express();
 
 const firebase = require("firebase-admin");
-const serviceAccount = require("./config/serviceAccountKey.json");
+const serviceAccount = require(CredManager.SERVICE_ACCOUNT_JSON_PATH());
 firebase.initializeApp({
   credential: firebase.credential.cert(serviceAccount),
   databaseURL: "https://ba-thesis-data.firebaseio.com"
