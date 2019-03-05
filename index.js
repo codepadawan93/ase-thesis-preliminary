@@ -1,23 +1,32 @@
+const CredManager = require("./Library/cred-manager");
 const Bot = require("./Bot/bot");
 const Recommender = require("./Library/recommender");
 const Express = require("express");
 const basicAuth = require("express-basic-auth");
 const bodyParser = require("body-parser");
+const messageTypes = require("./Models/messageTypes");
 
 const request = require("request");
 const path = require("path");
 
-const messageTypes = require("./Models/messageTypes");
 const server = Express();
+
+const firebase = require("firebase-admin");
+const serviceAccount = require("./config/serviceAccountKey.json");
+firebase.initializeApp({
+  credential: firebase.credential.cert(serviceAccount),
+  databaseURL: "https://ba-thesis-data.firebaseio.com"
+});
+const ref = firebase.database().ref();
 
 server.use(bodyParser.json());
 server.use(Express.static("./Static/build"));
 
+let recommender = null;
 let bot = new Bot({
   file: "./RiveScript/training-data.rive",
   defaultUser: "localuser"
 });
-let recommender = new Recommender();
 
 /**
  * Handle Facebook integration requests
@@ -219,7 +228,8 @@ const basicAuthConfig = {
 
 // Set username/pass fron env variables
 basicAuthConfig.users[process.env.ADMIN_USERNAME] = process.env.ADMIN_PASSWORD;
-server.use(basicAuth(basicAuthConfig));
+// Comment during local dev
+// server.use(basicAuth(basicAuthConfig));
 
 /**
  * Then handle direct requests
@@ -250,6 +260,9 @@ server.get("*", (req, res) => {
 });
 
 // Start server
-server.listen(process.env.PORT || 8080, function() {
+server.listen(process.env.PORT || 8080, async function() {
+  // If an api key does not exist, create it
+  CredManager.createServiceAccountJson();
+  recommender = await Recommender.getInstance(ref);
   console.log("Server has started on port " + this.address().port);
 });

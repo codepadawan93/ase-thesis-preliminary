@@ -2,17 +2,21 @@ const fs = require("fs");
 const Engine = require("./engine");
 
 class Recommender {
-  constructor() {
+  constructor(firebaseRef) {
     this.engine = new Engine();
     this.userName = null;
 
-    // read the files
-    const responsesData = fs.readFileSync("./Data/responses.json", "utf-8");
-    const attractionsData = fs.readFileSync("./Data/attractions.json", "utf-8");
-
-    // and extract the data
-    this.responses = JSON.parse(responsesData);
-    this.attractions = JSON.parse(attractionsData);
+    // refactor...
+    this.responsesRef = firebaseRef.child("responses");
+    this.attractionsRef = firebaseRef.child("attractions");
+  }
+  static async getInstance(ref) {
+    const ret = new Recommender(ref);
+    const responses = await ret.responsesRef.once("value");
+    const attractions = await ret.attractionsRef.once("value");
+    ret.responses = responses.val();
+    ret.attractions = attractions.val();
+    return ret;
   }
   parse(event) {
     const parts = event.split(/=/);
@@ -35,7 +39,8 @@ class Recommender {
     }
   }
   setUserName(userName) {
-    if (this.engine.rows.indexOf(userName) > -1) {
+    const rows = this.engine.rows.map(name => name.toLowerCase());
+    if (rows.indexOf(userName) > -1) {
       this.userName = userName;
       return `Welcome ${userName}!`;
     } else {
@@ -48,7 +53,7 @@ class Recommender {
   recommendAll() {
     const { recommendations } = this.userName
       ? this.engine.getRecommendationForExisting(this.userName)
-      : this.engine.getRecommendationForNew();
+      : this.engine.getRecommendationForNew({});
     const recommendationsString = recommendations
       .map(r => r.name)
       .slice(0, 10)

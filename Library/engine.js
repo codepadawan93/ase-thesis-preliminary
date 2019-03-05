@@ -8,6 +8,7 @@ class Engine {
   fit(ratings, items) {
     this.users = [];
     this.ratingsArray = [];
+    this.attractionsArray = [];
     this.matrix = [];
     this.colLabels = [];
     this.cols = [];
@@ -19,8 +20,8 @@ class Engine {
     this.items = items;
 
     // Create the user array and also parse the responses into a usable format
-    for (let key in this.ratings.responses) {
-      const response = this.ratings.responses[key];
+    for (let key in this.ratings) {
+      const response = this.ratings[key];
       const individualRatings = response.scores;
       this.users.push({
         userId: key,
@@ -32,16 +33,23 @@ class Engine {
         this.ratingsArray.push(score);
       }
     }
+    // parse the attractions as well
+    for (let key in this.items) {
+      this.attractionsArray.push({
+        ...this.items[key],
+        attractionFirebaseId: key
+      });
+    }
 
     // Create an users * items shaped matrix filled with zeros
     this.matrix = maths.zeros2d(
       this.users.length,
-      this.items.attractions.length
+      this.attractionsArray.length
     );
 
     // Remember the order of columns and rows
-    this.colLabels = items.attractions.map(attraction => attraction.name);
-    this.cols = items.attractions.map(
+    this.colLabels = this.attractionsArray.map(attraction => attraction.name);
+    this.cols = this.attractionsArray.map(
       attraction => attraction.attractionId + ""
     );
     this.rows = this.users.map(user => user.userName);
@@ -114,7 +122,7 @@ class Engine {
 
     // map over recommendations and pull in the needed data
     attractionIds.forEach(attractionId => {
-      const item = this.items.attractions
+      const item = this.attractionsArray
         .filter(_item => _item.attractionId === attractionId)
         .reduce(_item => _item);
       this.recommendations.push(item);
@@ -122,11 +130,12 @@ class Engine {
     return this;
   }
   getRecommendationForNew(ratings) {
-    ratings.userName = "extra-user";
-    this.ratings.responses.NEW_KEY = ratings;
+    const userName = Buffer.from(new Date().getTime() + "").toString("base64");
+    ratings.userName = userName;
+    this.ratings.NEW_KEY = ratings;
     this.fit(this.ratings, this.items)
       ._calculateSimilarities()
-      .getRecommendationForExisting("extra-user");
+      .getRecommendationForExisting(userName);
     return this;
   }
 }
