@@ -5,9 +5,11 @@ const Express = require("express");
 const basicAuth = require("express-basic-auth");
 const bodyParser = require("body-parser");
 const messageTypes = require("./Models/messageTypes");
-
 const request = require("request");
 const path = require("path");
+
+// If an api key does not exist, create it
+CredManager.createServiceAccountJson();
 
 const server = Express();
 
@@ -261,8 +263,6 @@ server.get("*", (req, res) => {
 
 // Start server
 server.listen(process.env.PORT || 8080, async function() {
-  // If an api key does not exist, create it
-  CredManager.createServiceAccountJson();
   recommender = await Recommender.getInstance(ref);
   console.log("Server has started on port " + this.address().port);
 });
