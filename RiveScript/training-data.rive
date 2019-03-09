@@ -622,7 +622,7 @@
 // Event responses
 
 + i am *
-- expression.attribution.username=<star>
+- <set name=<formal>>expression.attribution.username=<star>
 
 + my name is *
 - <set name=<formal>>expression.attribution.username=<star>
