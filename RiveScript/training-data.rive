@@ -636,7 +636,7 @@
 + suggest (a place|a destination|an attraction)
 - query.recommend.all
 
-+ [*] (objectives|attractions|landmarks|destinations|places) (in|around|near|nearby|close to) * [*]
++ [*] (objectives|attractions|landmarks|destinations|places|locations) (in|around|near|nearby|close to) * [*]
 - query.attractions.term=<star3>
 
 + [*] look for * [*]
