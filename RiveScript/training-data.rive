@@ -639,6 +639,9 @@
 + [*] (objectives|attractions|landmarks|destinations|places) (in|around|near|nearby|close to) * [*]
 - query.attractions.term=<star3>
 
++ [*] look for * [*]
+- query.attractions.term=<star1>
+
 + [*] tell me about * [*]
 - query.inform.term=<star1>
 

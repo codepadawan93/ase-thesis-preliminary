@@ -11,27 +11,31 @@ class Recommender {
     this.attractionsRef = firebaseRef.child("attractions");
   }
   static async getInstance(ref) {
+    // Do all the async stuff
     const ret = new Recommender(ref);
     const responses = await ret.responsesRef.once("value");
     const attractions = await ret.attractionsRef.once("value");
     ret.responses = responses.val();
     ret.attractions = attractions.val();
+    // Then build the model
+    ret.engine.fit(ret.responses, ret.attractions);
     return ret;
   }
   parse(event) {
     const parts = event.split(/=/);
     const type = parts[0];
     const term = parts[1] || "";
-    this.engine.fit(this.responses, this.attractions);
     switch (type) {
       case "expression.attribution.username":
         return this.setUserName(term);
       case "query.recommend.term":
-        return this.recommend(term);
+        return "TODO";
       case "query.recommend.all":
         return this.recommendAll();
+      case "query.attractions.term":
+        return this.recommendTerm(term);
       case "query.inform.term":
-        return "TODO";
+        return this.informTerm(term);
       case "query.image.term":
         return "TODO";
       default:
@@ -48,7 +52,33 @@ class Recommender {
     }
   }
   recommendTerm(term) {
-    return "TODO";
+    const recommendations = this.engine.getRecommendationsByKeyWord(term);
+    let recommendationsString = "";
+    if (recommendations.length > 0) {
+      recommendationsString = recommendations
+        .map(r => r.name)
+        .slice(0, 10)
+        .join("\n");
+    } else {
+      recommendationsString = `Sorry, I found no matching attractions for term ${term}`;
+    }
+    return recommendationsString;
+  }
+  informTerm(term) {
+    let recommendations = this.engine.getRecommendationsByKeyWord(term);
+    if (recommendations.length > 0) {
+    } else {
+      recommendations = this.engine.attractionsArray.filter(
+        attraction =>
+          attraction.name.includes(term) ||
+          attraction.description.includes(term)
+      );
+    }
+    if (recommendations.length > 0) {
+      return recommendations[0].description;
+    } else {
+      return `I found no relevant data on ${term}`;
+    }
   }
   recommendAll() {
     const { recommendations } = this.userName

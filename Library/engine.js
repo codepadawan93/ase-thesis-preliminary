@@ -1,8 +1,11 @@
 const maths = require("./maths");
+const TFIDF = require("./tfidf");
+const Utils = require("./utils");
 
 class Engine {
   constructor() {
     this.cutoffValue = 0.1;
+    this.KEYWORD_LENGTH = 5;
   }
 
   fit(ratings, items) {
@@ -15,6 +18,7 @@ class Engine {
     this.rows = [];
     this.similarities = [];
     this.recommendations = [];
+    this.keywords = {};
 
     this.ratings = ratings;
     this.items = items;
@@ -61,6 +65,9 @@ class Engine {
       const j = this.cols.indexOf(attractionId);
       this.matrix[i][j] = rating;
     }
+
+    // Calculate keywords for each attraction too
+    this._calculateKeywords();
     return this;
   }
 
@@ -93,6 +100,45 @@ class Engine {
     this.cutoffValue =
       sumSimilarity / (this.matrix.shape()[0] * this.matrix.shape()[1]);
     return this;
+  }
+
+  _calculateKeywords() {
+    // Iterate over all documents
+    for (let i = 0; i < this.attractionsArray.length; i++) {
+      const tfidf = new TFIDF();
+
+      const description = Utils.replaceInvalidChars(
+        this.attractionsArray[i].description
+      );
+      tfidf.termFreq(description);
+      let docCount = 0;
+      // Iterate again
+      for (let j = 0; j < this.attractionsArray.length; j++) {
+        // count IDF
+        const _description = Utils.replaceInvalidChars(
+          this.attractionsArray[j].description
+        );
+        tfidf.docFreq(_description);
+
+        // When we're finished
+        docCount++;
+        if (docCount === this.attractionsArray.length) {
+          // All the probabilities and divs
+          tfidf.finish(docCount);
+          tfidf.sortByScore();
+          docCount = 0;
+        }
+      }
+      const keywords = tfidf.getKeys().slice(0, 10); //this.KEYWORD_LENGTH);
+      this.attractionsArray[i].keywords = keywords;
+      keywords.map(k => {
+        // Beautiful type checking js
+        if (!Array.isArray(this.keywords[k])) {
+          this.keywords[k] = [];
+        }
+        this.keywords[k].push(this.attractionsArray[i].attractionId);
+      });
+    }
   }
 
   getRecommendationForExisting(userName) {
@@ -129,6 +175,7 @@ class Engine {
     });
     return this;
   }
+
   getRecommendationForNew(ratings) {
     const userName = Buffer.from(new Date().getTime() + "").toString("base64");
     ratings.userName = userName;
@@ -137,6 +184,21 @@ class Engine {
       ._calculateSimilarities()
       .getRecommendationForExisting(userName);
     return this;
+  }
+
+  getRecommendationsByKeyWord(word) {
+    if (!word || word.length < 3) {
+      return [];
+    } else {
+      const havingKeyword = this.keywords[word];
+      if (havingKeyword && havingKeyword.length > 0) {
+        return this.attractionsArray.filter(
+          attraction => havingKeyword.indexOf(attraction.attractionId) > -1
+        );
+      } else {
+        return [];
+      }
+    }
   }
 }
 
