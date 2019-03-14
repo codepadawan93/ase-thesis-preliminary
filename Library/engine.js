@@ -177,9 +177,12 @@ class Engine {
   }
 
   getRecommendationForNew(ratings) {
+    // Add a new user to the data
     const userName = Buffer.from(new Date().getTime() + "").toString("base64");
     ratings.userName = userName;
     this.ratings.NEW_KEY = ratings;
+
+    // fit the model again
     this.fit(this.ratings, this.items)
       ._calculateSimilarities()
       .getRecommendationForExisting(userName);
@@ -192,9 +195,24 @@ class Engine {
     } else {
       const havingKeyword = this.keywords[word];
       if (havingKeyword && havingKeyword.length > 0) {
-        return this.attractionsArray.filter(
-          attraction => havingKeyword.indexOf(attraction.attractionId) > -1
-        );
+        // Get those recommendations that are relevant. Then sort by TFIDF score
+        const recommendations = this.attractionsArray
+          .filter(
+            attraction => havingKeyword.indexOf(attraction.attractionId) > -1
+          )
+          .sort((a, b) => {
+            // If not present in these keywords, assign them a very high score so they go to the bottom
+            let rankA = a.keywords.indexOf(word);
+            let rankB = b.keywords.indexOf(word);
+            if (rankA === -1) {
+              rankA = 11;
+            }
+            if (rankB === -1) {
+              rankB = 11;
+            }
+            return rankA - rankB;
+          });
+        return recommendations;
       } else {
         return [];
       }

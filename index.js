@@ -200,7 +200,7 @@ function callSendAPI(sender_psid, response) {
  * Add headers for all responses
  *
  */
-server.use(function(req, res, next) {
+server.use((req, res, next) => {
   res.set("Content-Type", "application/json");
   res.set("Access-Control-Allow-Origin", "http://localhost:3000");
   res.set("Access-Control-Allow-Headers", "Authorization");
@@ -257,12 +257,11 @@ server.get(["/api", "/api/:message"], async (req, res) => {
 
 // Reroute everything else to client app
 server.get("*", (req, res) => {
-  console.log(res);
   res.sendFile(path.join(__dirname, "Static/build", "index.html"));
 });
 
 // Start server
 server.listen(process.env.PORT || 8080, async function() {
   recommender = await Recommender.getInstance(ref);
-  console.log("Server has started on port " + this.address().port);
+  console.log(`Server has started on port ${this.address().port}`);
 });
