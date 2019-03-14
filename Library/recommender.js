@@ -1,5 +1,6 @@
 const fs = require("fs");
 const Engine = require("./engine");
+const Utils = require("./utils");
 
 class Recommender {
   constructor(firebaseRef) {
@@ -28,7 +29,8 @@ class Recommender {
     // interpret the event and get the value
     const parts = event.split(/=/);
     const type = parts[0];
-    const term = parts[1] || "";
+    let term = parts[1] || "";
+    term = Utils.replaceInvalidChars(term);
 
     // Respond differently as a function of the event type
     switch (type) {
