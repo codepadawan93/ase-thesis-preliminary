@@ -1,21 +1,18 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import logo from "../theme/img/your_next_vacation.png";
 
 const Navbar = props => {
   return (
     <nav className="navbar navbar-light bg-light static-top">
       <div className="container">
-        <a className="navbar-brand" href="#">
+        <Link className="navbar-brand" to="/">
           <img src={logo} width="35" height="35" alt="" className="mr-3" />
           Your next vacation
-        </a>
-        <a
-          className="btn btn-primary"
-          href="#"
-          onClick={e => props.handleNavigate(e)}
-        >
+        </Link>
+        <Link className="btn btn-primary" to="/sign-in">
           Sign in
-        </a>
+        </Link>
       </div>
     </nav>
   );

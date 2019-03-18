@@ -4,6 +4,8 @@ import Navbar from "./components/Navbar";
 import Masthead from "./components/Masthead";
 import Features from "./components/Features";
 import Footer from "./components/Footer";
+import SignIn from "./components/SignIn";
+import SignUp from "./components/SignUp";
 import { Launcher } from "react-chat-window";
 import toastr from "toastr";
 
@@ -157,10 +159,10 @@ class App extends Component {
                 </div>
               )}
             />
-            <Route path="/sign-in" render={() => <div>SIGN IN</div>} />
-            <Route path="/sign-up" render={() => <div>SIGN UP</div>} />
+            <Route exact path="/sign-in" component={SignIn} />
+            <Route path="/sign-up" component={SignUp} />
             <Route path="/rate" render={() => <div>Rate Attractions</div>} />
-            <Route path="/admin" render={() => <div>admin interface</div>} />
+            <Route path="/admin" component={null} />
           </Switch>
           <Footer
             handleNavigate={this._handleNavigate}
