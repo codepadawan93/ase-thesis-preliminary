@@ -141,35 +141,42 @@ class App extends Component {
     return (
       <div className="App">
         <Router>
+          <Navbar handleNavigate={this._handleNavigate} />
           <Switch>
-            <Route path="/" component={null} />
+            <Route
+              exact
+              path="/"
+              render={() => (
+                <div>
+                  <Masthead
+                    placeholder="Enter your destination..."
+                    disabled={false}
+                    handleSubmit={this._triggerChatWindow}
+                  />
+                  <Features />
+                </div>
+              )}
+            />
+            <Route path="/sign-in" render={() => <div>SIGN IN</div>} />
+            <Route path="/sign-up" render={() => <div>SIGN UP</div>} />
+            <Route path="/rate" render={() => <div>Rate Attractions</div>} />
+            <Route path="/admin" render={() => <div>admin interface</div>} />
           </Switch>
+          <Footer
+            handleNavigate={this._handleNavigate}
+            facebookHref="http://facebook.com/"
+          />
+          <Launcher
+            ref={this.chatWindow}
+            agentProfile={{
+              teamName: "Ionut",
+              imageUrl: logo
+            }}
+            onMessageWasSent={this._onMessageWasSent}
+            messageList={this.state.messageList}
+            showEmoji={true}
+          />
         </Router>
-        <Navbar handleNavigate={this._handleNavigate} />
-
-        <Masthead
-          placeholder="Enter your destination..."
-          disabled={false}
-          handleSubmit={this._triggerChatWindow}
-        />
-
-        <Features />
-
-        <Footer
-          handleNavigate={this._handleNavigate}
-          facebookHref="http://facebook.com/"
-        />
-
-        <Launcher
-          ref={this.chatWindow}
-          agentProfile={{
-            teamName: "Ionut",
-            imageUrl: logo
-          }}
-          onMessageWasSent={this._onMessageWasSent}
-          messageList={this.state.messageList}
-          showEmoji={true}
-        />
       </div>
     );
   }
