@@ -5,16 +5,25 @@ class AttractionForm extends Component {
   constructor() {
     super();
     this.state = {
-      counties: counties
+      counties: counties,
+      attractionData: {
+        name: "",
+        county: "",
+        description: "",
+        image: "",
+        latitude: 0.0,
+        longitude: 0.0,
+        rating: 0,
+        address: "",
+        season: ""
+      }
     };
-    console.log(this.state.counties);
   }
 
   renderCounties() {
     const countyOptions = [];
     countyOptions.push(<option value="">----- none ------</option>);
     for (let key in this.state.counties) {
-      console.log(key);
       countyOptions.push(
         <option value={key}>{this.state.counties[key]}</option>
       );
@@ -40,6 +49,8 @@ class AttractionForm extends Component {
                     type="text"
                     placeholder=""
                     className="form-control input-md"
+                    value={this.state.attractionData.name}
+                    onChange={e => this.handleChange(e)}
                   />
                 </div>
               </div>
@@ -49,7 +60,13 @@ class AttractionForm extends Component {
                   County
                 </label>
                 <div className="col-md-4">
-                  <select id="county" name="county" className="form-control">
+                  <select
+                    id="county"
+                    name="county"
+                    className="form-control"
+                    value={this.state.attractionData.county}
+                    onChange={e => this.handleChange(e)}
+                  >
                     {this.renderCounties()}
                   </select>
                 </div>
@@ -67,7 +84,42 @@ class AttractionForm extends Component {
                     className="form-control"
                     id="description"
                     name="description"
+                    onChange={e => this.handleChange(e)}
+                  >
+                    {this.state.attractionData.description}
+                  </textarea>
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label
+                  className="col-md-10 control-label"
+                  htmlFor="description"
+                >
+                  Image
+                </label>
+                <div className="col-md-10">
+                  <input
+                    id="image"
+                    name="image"
+                    type="text"
+                    placeholder=""
+                    className="form-control input-md"
+                    value={this.state.attractionData.image}
+                    onChange={e => this.handleChange(e)}
                   />
+                </div>
+              </div>
+
+              <div className="form-group">
+                <div className="col-md-10">
+                  {this.state.attractionData.image ? (
+                    <img
+                      src={this.state.attractionData.image}
+                      alt="no-image"
+                      className="img-thumbnail"
+                    />
+                  ) : null}
                 </div>
               </div>
 
@@ -79,9 +131,12 @@ class AttractionForm extends Component {
                   <input
                     id="latitude"
                     name="latitude"
-                    type="text"
+                    type="number"
+                    step="0.1"
                     placeholder=""
                     className="form-control input-md"
+                    onChange={e => this.handleChange(e)}
+                    value={this.state.attractionData.latitude}
                   />
                 </div>
               </div>
@@ -94,9 +149,12 @@ class AttractionForm extends Component {
                   <input
                     id="longitude"
                     name="longitude"
-                    type="text"
+                    type="number"
+                    step="0.1"
                     placeholder=""
                     className="form-control input-md"
+                    onChange={e => this.handleChange(e)}
+                    value={this.state.attractionData.longitude}
                   />
                 </div>
               </div>
@@ -107,13 +165,7 @@ class AttractionForm extends Component {
                 </label>
                 <div className="col-md-10">
                   <label className="radio-inline" htmlFor="rating-0">
-                    <input
-                      type="radio"
-                      name="rating"
-                      id="rating-0"
-                      value="1"
-                      checked="checked"
-                    />
+                    <input type="radio" name="rating" id="rating-0" value="1" />
                     1
                   </label>
                   <label className="radio-inline" htmlFor="rating-1">
@@ -144,7 +196,10 @@ class AttractionForm extends Component {
                     className="form-control"
                     id="address"
                     name="address"
-                  />
+                    onChange={e => this.handleChange(e)}
+                  >
+                    {this.state.attractionData.address}
+                  </textarea>
                 </div>
               </div>
 
@@ -158,7 +213,9 @@ class AttractionForm extends Component {
                     name="season"
                     className="form-control"
                     multiple="multiple"
+                    onChange={e => this.handleChange(e)}
                   >
+                    <option value="ANY">Any</option>
                     <option value="SPRING">Spring</option>
                     <option value="SUMMER">Summer</option>
                     <option value="AUTUMN">Autumn</option>
@@ -166,11 +223,40 @@ class AttractionForm extends Component {
                   </select>
                 </div>
               </div>
+              <div className="form-group">
+                <button
+                  className="btn btn-primary"
+                  onClick={e => this.handleSubmit(e)}
+                >
+                  Submit
+                </button>
+              </div>
             </fieldset>
           </form>
         </div>
       </div>
     );
+  }
+  handleSubmit(event) {
+    event.preventDefault();
+  }
+  handleChange(event) {
+    const target = event.target;
+    if (target.name === "season") {
+      for (let option of event.target.options) {
+        if (option.selected) {
+          // TODO:: finish this...
+          console.log(option.value);
+        }
+      }
+    } else {
+      this.setState({
+        attractionData: {
+          ...this.state.attractionData,
+          [target.name]: target.value
+        }
+      });
+    }
   }
 }
 

@@ -12,7 +12,7 @@ import SidebarToggle from "./adminComponents/SidebarToggle";
 import Dashboard from "./adminComponents/Dashboard";
 import AttractionForm from "./adminComponents/AttractionForm";
 import AttractionList from "./adminComponents/AttractionList";
-
+import BreadcrumbArea from "./adminComponents/BreadcrumbArea";
 class Admin extends Component {
   constructor() {
     super();
@@ -31,12 +31,13 @@ class Admin extends Component {
             <Route path="/admin" component={Sidebar} />
             <Route path="/admin" component={SidebarToggle} />
           </div>
-          <Switch>
-            <Route exact path="/admin/" component={Dashboard} />
-            <Route exact path="/admin/attractions" component={AttractionList} />
-            <Route path="/admin/attractions/:id" component={AttractionForm} />
-          </Switch>
         </div>
+        <BreadcrumbArea />
+        <Switch>
+          <Route exact path="/admin/" component={Dashboard} />
+          <Route exact path="/admin/attractions" component={AttractionList} />
+          <Route path="/admin/attractions/:id" component={AttractionForm} />
+        </Switch>
       </div>
     );
   }

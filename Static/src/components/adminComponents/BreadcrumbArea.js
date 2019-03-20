@@ -28,11 +28,13 @@ class BreadcrumbArea extends Component {
 
   render() {
     return (
-      <nav aria-label="breadcrumb">
-        <ol className="breadcrumb">
-          {this._parseRoute(this.props.location.pathname)}
-        </ol>
-      </nav>
+      <div className="col-md-10 offset-md-2">
+        <nav aria-label="breadcrumb">
+          <ol className="breadcrumb">
+            {this._parseRoute(this.props.location.pathname)}
+          </ol>
+        </nav>
+      </div>
     );
   }
 }
