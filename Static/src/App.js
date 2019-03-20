@@ -6,6 +6,7 @@ import Features from "./components/Features";
 import Footer from "./components/Footer";
 import SignIn from "./components/SignIn";
 import SignUp from "./components/SignUp";
+import Admin from "./components/Admin";
 import { Launcher } from "react-chat-window";
 import toastr from "toastr";
 
@@ -162,7 +163,7 @@ class App extends Component {
             <Route exact path="/sign-in" component={SignIn} />
             <Route path="/sign-up" component={SignUp} />
             <Route path="/rate" render={() => <div>Rate Attractions</div>} />
-            <Route path="/admin" component={null} />
+            <Route path="/admin" component={Admin} />
           </Switch>
           <Footer
             handleNavigate={this._handleNavigate}

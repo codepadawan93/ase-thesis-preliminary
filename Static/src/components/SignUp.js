@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import { Link, Redirect } from "react-router-dom";
-import Navbar from "./Navbar";
-import Footer from "./Footer";
+import toastr from "toastr";
 import { request, methods } from "../helpers/HttpHelper";
 
 class SignUp extends Component {
@@ -262,12 +261,8 @@ class SignUp extends Component {
   };
 
   showErrors = () => {
-    return this.state.errors.map((error, itemKey) => {
-      return (
-        <div className="alert alert-danger" role="alert" key={itemKey}>
-          {error}
-        </div>
-      );
+    this.state.errors.forEach(e => {
+      toastr.error(e);
     });
   };
 }
