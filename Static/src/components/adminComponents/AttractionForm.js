@@ -15,7 +15,7 @@ class AttractionForm extends Component {
         longitude: 0.0,
         rating: 0,
         address: "",
-        season: ""
+        season: []
       }
     };
   }
@@ -239,24 +239,28 @@ class AttractionForm extends Component {
   }
   handleSubmit(event) {
     event.preventDefault();
+    console.log(this.state.attractionData.season);
   }
   handleChange(event) {
     const target = event.target;
+    let value;
     if (target.name === "season") {
+      const selected = [];
       for (let option of event.target.options) {
         if (option.selected) {
-          // TODO:: finish this...
-          console.log(option.value);
+          selected.push(option.value);
         }
       }
+      value = selected;
     } else {
-      this.setState({
-        attractionData: {
-          ...this.state.attractionData,
-          [target.name]: target.value
-        }
-      });
+      value = target.value;
     }
+    this.setState({
+      attractionData: {
+        ...this.state.attractionData,
+        [target.name]: value
+      }
+    });
   }
 }
 

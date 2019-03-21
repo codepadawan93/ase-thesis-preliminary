@@ -13,6 +13,7 @@ import Dashboard from "./adminComponents/Dashboard";
 import AttractionForm from "./adminComponents/AttractionForm";
 import AttractionList from "./adminComponents/AttractionList";
 import BreadcrumbArea from "./adminComponents/BreadcrumbArea";
+
 class Admin extends Component {
   constructor() {
     super();

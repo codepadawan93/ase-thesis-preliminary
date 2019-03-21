@@ -16,9 +16,6 @@ class Sidebar extends Component {
             <Link to="/admin/attractions">Attractions</Link>
           </li>
           <li>
-            <Link to="/admin/attractions">New Attraction</Link>
-          </li>
-          <li>
             <Link to="/">Back</Link>
           </li>
         </ul>
