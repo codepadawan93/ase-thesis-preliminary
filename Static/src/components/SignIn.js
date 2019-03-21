@@ -1,11 +1,9 @@
 import React, { Component } from "react";
 import { Link, Redirect } from "react-router-dom";
 import toastr from "toastr";
-import { request, methods } from "../helpers/HttpHelper";
+import firebase from "firebase";
 
 class SignIn extends Component {
-  AUTH_URL = "/api/authenticate/";
-  ERROR_TIMEOUT = 5000;
   constructor() {
     super();
     this.state = {
@@ -23,6 +21,7 @@ class SignIn extends Component {
   }
 
   render() {
+    this.showErrors();
     return (
       <div>
         {this.state.shouldRedirect ? (
@@ -30,7 +29,6 @@ class SignIn extends Component {
         ) : null}
         <div className="container-fluid">
           <div className="col-md-8 offset-md-2">
-            {this.showErrors()}
             <form>
               <h2>Sign in</h2>
               <div className="form-group row">
@@ -94,23 +92,25 @@ class SignIn extends Component {
   }
 
   handleLogout = () => {
-    //deleteCookie("api_token");
-    this.setState({ currentUser: null });
+    firebase
+      .auth()
+      .signOut()
+      .then(function() {
+        this.setState({ currentUser: null });
+      })
+      .catch(function(err) {
+        this.setErrors([`${err.code} : ${err.message}`]);
+      });
   };
 
-  componentWillMount = async () => {
-    const apiToken = null;
-    //const apiToken = getCookie("api_token");
-    if (apiToken && apiToken !== "") {
-      const res = await fetch(this.AUTH_URL + encodeURIComponent(apiToken));
-      const json = await res.json();
-      if (json.success) {
-        this.setState({
-          ...this.state,
-          currentUser: json.data,
-          shouldRedirect: true
-        });
-      }
+  componentWillMount = () => {
+    const user = firebase.auth().currentUser;
+    if (user) {
+      this.setState({
+        ...this.state,
+        currentUser: user,
+        shouldRedirect: true
+      });
     }
   };
 
@@ -118,15 +118,21 @@ class SignIn extends Component {
     e.preventDefault();
     if (this.validateUser()) {
       const { userName, pass } = this.state.userData;
-      const res = await request(this.AUTH_URL, methods.POST, {
-        user_name: userName,
-        password: pass
-      });
-      const json = await res.json();
-      if (json.success) {
-        this.setState({ shouldRedirect: true });
-      } else if (res.status === 401 || res.status === 404) {
-        this.setErrors(["Unauthorized: wrong username or password"]);
+      try {
+        const result = await firebase
+          .auth()
+          .signInWithEmailAndPassword(userName, pass);
+        if (result.user) {
+          this.setState({
+            ...this.state,
+            currentUser: result.user,
+            shouldRedirect: true
+          });
+        } else {
+          this.setErrors(["No user signed in"]);
+        }
+      } catch (err) {
+        this.setErrors([`${err.code} : ${err.message}`]);
       }
     }
   };
@@ -144,7 +150,6 @@ class SignIn extends Component {
       valid = false;
     }
     this.setErrors(errors);
-    setTimeout(() => this.resetErrors(), this.ERROR_TIMEOUT);
     return valid;
   }
 

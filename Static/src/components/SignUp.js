@@ -1,12 +1,9 @@
 import React, { Component } from "react";
 import { Link, Redirect } from "react-router-dom";
 import toastr from "toastr";
-import { request, methods } from "../helpers/HttpHelper";
+import firebase from "firebase";
 
 class SignUp extends Component {
-  AUTH_URL = "/api/authenticate/";
-  BASE_URL = "/api/users/";
-  ERROR_TIMEOUT = 5000;
   constructor() {
     super();
     this.state = {
@@ -26,6 +23,8 @@ class SignUp extends Component {
     };
   }
   render() {
+    this.showErrors();
+    this.showMessages();
     return (
       <div>
         {this.state.shouldRedirect ? (
@@ -33,8 +32,6 @@ class SignUp extends Component {
         ) : null}
         <div className="container-fluid">
           <div className="col-md-8 offset-md-2">
-            {this.showErrors()}
-            {this.showMessages()}
             <h2>Sign up</h2>
             <form>
               <div className="form-group row">
@@ -148,54 +145,31 @@ class SignUp extends Component {
     );
   }
 
-  handleLogout = () => {
-    // deleteCookie("api_token");
-    this.setState({ currentUser: null });
-  };
-
-  componentWillMount = async () => {
-    //const apiToken = getCookie("api_token");
-    const apiToken = null;
-    if (apiToken && apiToken !== "") {
-      const res = await fetch(this.AUTH_URL + encodeURIComponent(apiToken));
-      const json = await res.json();
-      if (json.success) {
-        this.setState({
-          ...this.state,
-          currentUser: json.data,
-          shouldRedirect: true
-        });
-      }
-    }
-  };
+  componentWillMount = async () => {};
 
   handleSubmit = async e => {
     e.preventDefault();
     if (this.state.submitted) return;
     if (this.validateUser()) {
-      const { userName, pass, firstName, lastName } = this.state.userData;
-      const res = await request(this.BASE_URL, methods.POST, {
-        user_name: userName,
-        password: pass,
-        first_name: firstName,
-        last_name: lastName,
-        role_id: 1
-      });
-      const json = await res.json();
-      if (json.success) {
-        this.setMessages(["User successfully added!"]);
-        this.setState({ submitted: true });
-        setTimeout(
-          () =>
-            this.setState({
-              ...this.state,
-              shouldRedirect: true,
-              redirectTo: "/login"
-            }),
-          1000
-        );
-      } else {
-        this.setErrors(json.err.errors.map(o => o.message));
+      try {
+        const { userName, pass, firstName, lastName } = this.state.userData;
+        const res = await firebase
+          .auth()
+          .createUserWithEmailAndPassword(userName, pass);
+
+        if (res.user) {
+          this.setMessages(["User successfully added!"]);
+          this.setState({ submitted: true });
+          this.setState({
+            ...this.state,
+            shouldRedirect: true,
+            redirectTo: "/"
+          });
+        } else {
+          this.setErrors(["User was not created."]);
+        }
+      } catch (err) {
+        this.setErrors([`${err.code}: ${err.message}`]);
       }
     }
   };
@@ -223,7 +197,6 @@ class SignUp extends Component {
       valid = false;
     }
     this.setErrors(errors);
-    setTimeout(() => this.resetErrors(), this.ERROR_TIMEOUT);
     return valid;
   }
 
@@ -244,11 +217,7 @@ class SignUp extends Component {
 
   showMessages = () => {
     return this.state.messages.map((message, itemKey) => {
-      return (
-        <div className="alert alert-success" role="alert" key={itemKey}>
-          {message}
-        </div>
-      );
+      toastr.success(message);
     });
   };
 
