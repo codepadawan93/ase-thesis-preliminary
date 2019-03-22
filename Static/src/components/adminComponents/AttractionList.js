@@ -2,10 +2,12 @@ import React, { Component } from "react";
 import FloatingActionButton from "./FloatingActionButton";
 import { Link } from "react-router-dom";
 import { request, methods } from "../../helpers/HttpHelper";
+import firebase from "firebase";
 
 class AttractionList extends Component {
   constructor(props) {
     super(props);
+    this.database = firebase.database();
     this.props = props;
     this.state = {
       items: [],
@@ -24,7 +26,7 @@ class AttractionList extends Component {
         <table className="table table-striped">
           <thead>
             <tr>
-              <th>Attraction id</th>
+              <th>#</th>
               <th>Name</th>
               <th>County</th>
               <th>Address</th>
@@ -40,11 +42,17 @@ class AttractionList extends Component {
   }
   async componentDidMount() {
     try {
-      const res = await fetch(this.BASE_URL);
-      const json = await res.json();
-      if (json.success) {
-        this.setState({ items: json.data });
-      }
+      const attractionRef = firebase.database().ref('attractions')
+      attractionRef.on('value', snapshot => {
+        const attractions = snapshot.val();
+        const attractionArray = [];
+        for(let key in attractions){
+          const attraction = attractions[key];
+          attraction.firebaseId = key;
+          attractionArray.push(attraction);
+        }
+        this.setState({items: attractionArray});
+      });
     } catch (e) {
       this.setErrors([e.toString()]);
     }
@@ -52,22 +60,23 @@ class AttractionList extends Component {
   renderItems = () => {
     return this.state.items.map((item, itemKey) => {
       return (
-        <tr key={itemKey}>
-          <td>{item.list_id}</td>
-          <td>{item.user_id}</td>
-          <td>{item.personal_rating}</td>
-          <td>{item.createdAt}</td>
-          <td>{item.updatedAt}</td>
+        <tr key={item.firebaseId}>
+          <td>{itemKey + 1}</td>
+          <td>{item.name.substring(0, 25)}</td>
+          <td>{item.county}</td>
+          <td>{item.address}</td>
+          <td>{item.description.substring(0, 80)}</td>
+          <td>{item.rating}</td>
           <td>
             <Link
-              to={`/admin/attractions/${item.list_id}`}
-              className="btn btn-warning btn-item text-white"
+              to={`/admin/attractions/${item.firebaseId}`}
+              className="btn btn-warning btn-item btn-sm text-white"
             >
               <i className="fa fa-edit" />
             </Link>
             <button
-              className="btn btn-danger btn-item text-white"
-              onClick={e => this.handleDeleteItem(item.list_id)}
+              className="btn btn-danger btn-item btn-sm text-white"
+              onClick={e => this.handleDeleteItem(item.firebaseId)}
             >
               <i className="fa fa-trash" />
             </button>
@@ -81,7 +90,7 @@ class AttractionList extends Component {
       this.setState({
         items: this.state.items.filter(item => item.list_id !== id)
       });
-      request(this.BASE_URL + id, methods.DELETE);
+      alert("TODO!!!");
     }
   };
 
@@ -96,15 +105,7 @@ class AttractionList extends Component {
 
   showErrors = () => {
     return this.state.errors.map((error, itemKey) => {
-      return (
-        <div
-          className="alert alert-danger floating-message col-md-11"
-          role="alert"
-          key={itemKey}
-        >
-          {error}
-        </div>
-      );
+      console.log(error);
     });
   };
 }

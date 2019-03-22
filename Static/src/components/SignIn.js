@@ -91,27 +91,16 @@ class SignIn extends Component {
     );
   }
 
-  handleLogout = () => {
-    firebase
-      .auth()
-      .signOut()
-      .then(function() {
-        this.setState({ currentUser: null });
-      })
-      .catch(function(err) {
-        this.setErrors([`${err.code} : ${err.message}`]);
-      });
-  };
-
   componentWillMount = () => {
-    const user = firebase.auth().currentUser;
-    if (user) {
-      this.setState({
-        ...this.state,
-        currentUser: user,
-        shouldRedirect: true
-      });
-    }
+    firebase.auth().onAuthStateChanged(user => {
+      if (user) {
+        this.setState({
+          ...this.state,
+          currentUser: user,
+          shouldRedirect: true
+        });
+      }
+    });
   };
 
   handleSubmit = async e => {

@@ -1,11 +1,15 @@
 import React, { Component } from "react";
 import counties from "../../data/counties";
+import firebase from "firebase";
+
 
 class AttractionForm extends Component {
   constructor() {
     super();
+    this.database = firebase.database();
     this.state = {
       counties: counties,
+      firebaseId: "new",
       attractionData: {
         name: "",
         county: "",
@@ -19,7 +23,12 @@ class AttractionForm extends Component {
       }
     };
   }
-
+  componentWillMount(){
+    const id = this.props.match.params.id;
+    if(id !== "new"){
+      this.populateForm(id);
+    }
+  }
   renderCounties() {
     const countyOptions = [];
     countyOptions.push(<option value="">----- none ------</option>);
@@ -236,6 +245,16 @@ class AttractionForm extends Component {
         </div>
       </div>
     );
+  }
+  populateForm = async id => {
+    try {
+      const snapshot = await this.database.ref("/attractions/" + id).once('value');
+      const attraction  = snapshot.val();
+      // TODO:: finish this
+      // this.setState({attractionData: attraction});
+    } catch(err) {
+      console.error(err);
+    }
   }
   handleSubmit(event) {
     event.preventDefault();

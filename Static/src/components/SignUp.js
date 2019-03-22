@@ -52,7 +52,7 @@ class SignUp extends Component {
               </div>
               <div className="form-group row">
                 <label htmlFor="pass" className="col-md-2 col-form-label">
-                  Password:{" "}
+                  Password:
                 </label>
                 <div className="col-md-10">
                   <input
@@ -68,7 +68,7 @@ class SignUp extends Component {
               </div>
               <div className="form-group row">
                 <label htmlFor="pass2" className="col-md-2 col-form-label">
-                  Confirm password:{" "}
+                  Confirm password:
                 </label>
                 <div className="col-md-10">
                   <input
@@ -84,7 +84,7 @@ class SignUp extends Component {
               </div>
               <div className="form-group row">
                 <label htmlFor="firstName" className="col-md-2 col-form-label">
-                  First Name:{" "}
+                  First Name:
                 </label>
                 <div className="col-md-10">
                   <input
@@ -100,7 +100,7 @@ class SignUp extends Component {
               </div>
               <div className="form-group row">
                 <label htmlFor="lastName" className="col-md-2 col-form-label">
-                  Last Name:{" "}
+                  Last Name:
                 </label>
                 <div className="col-md-10">
                   <input
@@ -145,7 +145,17 @@ class SignUp extends Component {
     );
   }
 
-  componentWillMount = async () => {};
+  componentWillMount = () => {
+    firebase.auth().onAuthStateChanged(user => {
+      if (user) {
+        this.setState({
+          ...this.state,
+          currentUser: user,
+          shouldRedirect: true
+        });
+      }
+    });
+  };
 
   handleSubmit = async e => {
     e.preventDefault();
@@ -159,9 +169,9 @@ class SignUp extends Component {
 
         if (res.user) {
           this.setMessages(["User successfully added!"]);
-          this.setState({ submitted: true });
           this.setState({
             ...this.state,
+            submitted: true,
             shouldRedirect: true,
             redirectTo: "/"
           });
