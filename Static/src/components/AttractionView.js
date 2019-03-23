@@ -21,7 +21,7 @@ class AttractionView extends Component {
         return (
         <div className="container">
           <div className="row">
-            <div className="col-md-9">
+            <div className="col-md-7">
                 <h1>{this.state.attractionData.name}</h1>
                 <ul className="nav nav-tabs" id="myTab" role="tablist">
                 <li className="nav-item">
@@ -38,29 +38,33 @@ class AttractionView extends Component {
                 { this.state.tabActive === "description" ? 
                 <div className="tab-pane fade show active">
                   <p>{this.state.attractionData.description}</p>
-                  <p>Best to visit in: {this.state.attractionData.season.map(e => <span class="badge badge-pill badge-primary">{e}</span>)}</p>
+                  <p>Best to visit in: {this.state.attractionData.season.map(e => <span className="badge badge-pill badge-primary">{e}</span>)}</p>
                   </div> : null }
                 { this.state.tabActive === "address" ? <div className="tab-pane fade show active"><p>{this.state.attractionData.address}</p></div> : null }
                 { this.state.tabActive === "facts" ? <div className="tab-pane fade show active">
                 <ul className="list-group list-group-flush">
                   <li className="list-group-item d-flex justify-content-between align-items-center">Attraction ID: 
-                    <span class="badge badge-primary badge-pill">{this.state.attractionData.attractionId}</span></li>
+                    <span className="badge badge-primary badge-pill">{this.state.attractionData.attractionId}</span></li>
                   <li className="list-group-item d-flex justify-content-between align-items-center">Category:  
-                    <span class="badge badge-primary badge-pill">{this.state.attractionData.category}</span></li>
+                    <span className="badge badge-primary badge-pill">{this.state.attractionData.category}</span></li>
                   <li className="list-group-item d-flex justify-content-between align-items-center">County: 
-                    <span class="badge badge-primary badge-pill">{this.state.attractionData.county}</span></li>
+                    <span className="badge badge-primary badge-pill">{this.state.attractionData.county}</span></li>
                   <li className="list-group-item d-flex justify-content-between align-items-center">Latitude: 
-                    <span class="badge badge-primary badge-pill">{this.state.attractionData.latitude}</span></li>
+                    <span className="badge badge-primary badge-pill">{this.state.attractionData.latitude}</span></li>
                   <li className="list-group-item d-flex justify-content-between align-items-center">Longitude: 
-                    <span class="badge badge-primary badge-pill">{this.state.attractionData.longitude}</span></li>
+                    <span className="badge badge-primary badge-pill">{this.state.attractionData.longitude}</span></li>
                   <li className="list-group-item d-flex justify-content-between align-items-center">Average rating: 
-                    <span class="badge badge-primary badge-pill">{this.state.attractionData.rating}</span></li>
+                    <span className="badge badge-primary badge-pill">{this.state.attractionData.rating}</span></li>
                 </ul>
                 </div> : null }
               </div>
             </div>
-            <div className="col-md-3">
-            
+            <div className="col-md-5">
+            {
+              this.state.attractionData.latitude && this.state.attractionData.longitude ?
+            <iframe className="map-frame" src={`https://maps.google.com/maps?q=${this.state.attractionData.latitude},${this.state.attractionData.longitude}&hl=en&z=9&output=embed`}></iframe> :
+            null
+            }
             </div>
           </div>
         </div>);

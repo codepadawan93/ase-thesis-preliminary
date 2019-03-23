@@ -11,6 +11,7 @@ class BrowseAttractions extends Component {
     this.currentRef = React.createRef();
     this.state = {
       position: [],
+      currentUser: null,
       attractions: [],
       displayAttractions: [],
       scores: [],
@@ -23,6 +24,7 @@ class BrowseAttractions extends Component {
       shouldRedirect: false
     };
   }
+  
   render() {
     return (
       <div className="row">
@@ -83,6 +85,12 @@ class BrowseAttractions extends Component {
   componentWillMount() {
     this.fetchItems();
     this.setLocation();
+    firebase.auth().onAuthStateChanged(user => {
+      if (user) {
+        const userName = user.email.split(/@/gi)[0];
+        this.setState({ ...this.state, currentUser: user, userName });
+      }
+    });
   }
   renderItems = () => {
     return this.state.displayAttractions.map((attraction, i) => {
@@ -130,7 +138,7 @@ class BrowseAttractions extends Component {
   };
   handleClick = async e => {
     e.preventDefault();
-    if (this.validateScores()) {
+    if (true || this.validateScores()) {
       const { latitude, longitude } = this.state.position;
       const data = {
         location: { latitude, longitude },
@@ -139,6 +147,25 @@ class BrowseAttractions extends Component {
       };
       try {
         // send data to firebase
+        const dataSnapshot = await this.database.ref("responses")
+          .orderByChild('userName')
+          .equalTo(this.state.userName)
+          .once("value");
+        const response = dataSnapshot.val();
+        if(response){
+          // Get the sys id and merge the two objects...
+          const id = this.getFirebaseId(response);
+          const fields = response[id];
+          fields.scores = [...fields.scores, ...data.scores];
+          if(!fields.location && data.location){
+            fields.location = data.location;
+          }
+          await this.database.ref(`responses/${id}`).update(fields);
+        } else {
+          // new response then
+          await this.database.ref("responses").push(data);
+        }
+        toastr.success("Response has been submitted!");
       } catch (e) {
         toastr.error(`An error has occurred: ${e}`);
       }
@@ -146,6 +173,19 @@ class BrowseAttractions extends Component {
       toastr.warning("Please fill in at least 15 responses!");
     }
   };
+
+  getFirebaseId(response){
+    let id = null;
+    for(let key in response){
+      id = key;
+    }
+    if(id){
+      return id;
+    } else {
+      throw new Error("Invalid dataSnapshot value provided");
+    }
+  }
+
   handleChange = e => {
     const { value, name } = e.target;
     this.setState({ search: { ...this.state.search, [name]: value } });
