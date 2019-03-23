@@ -69,6 +69,10 @@ class Navbar extends Component {
               >
                 Sign out
               </button>
+              <Link className="btn btn-primary" to="/browse-attractions">
+                Browse attractions
+              </Link>
+              {this.state.currentUser.uid === "ACm5e6uGbvSjHmxGam3Ic7f9IAj1" ? <Link className="btn btn-primary" to="/admin">Admin</Link> : null}
             </div>
           ) : (
             <Link className="btn btn-primary" to="/sign-in">

@@ -7,6 +7,8 @@ import Footer from "./components/Footer";
 import SignIn from "./components/SignIn";
 import SignUp from "./components/SignUp";
 import Admin from "./components/Admin";
+import BrowseAttractions from "./components/BrowseAttractions";
+import AttractionView from "./components/AttractionView";
 import { Launcher } from "react-chat-window";
 import toastr from "toastr";
 
@@ -17,6 +19,7 @@ import "./theme/vendor/bootstrap/css/bootstrap.min.css";
 import "./theme/vendor/fontawesome-free/css/all.min.css";
 import "./theme/vendor/simple-line-icons/css/simple-line-icons.css";
 import "./theme/css/landing-page.min.css";
+
 
 class App extends Component {
   // TODO::obscure these from client-accessible code
@@ -162,7 +165,8 @@ class App extends Component {
             />
             <Route exact path="/sign-in" component={SignIn} />
             <Route path="/sign-up" component={SignUp} />
-            <Route path="/rate" render={() => <div>Rate Attractions</div>} />
+            <Route exact path="/browse-attractions" component={BrowseAttractions} />
+            <Route path="/browse-attractions/:id" component={AttractionView} />
             <Route path="/admin" component={Admin} />
           </Switch>
           <Footer

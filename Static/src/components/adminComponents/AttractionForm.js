@@ -1,15 +1,21 @@
 import React, { Component } from "react";
 import counties from "../../data/counties";
+import seasons from "../../data/seasons";
+import toastr from "toastr";
 import firebase from "firebase";
 
 
 class AttractionForm extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
+    this.props = props;
     this.database = firebase.database();
+    this.id = this.props.match.params.id;
     this.state = {
       counties: counties,
-      firebaseId: "new",
+      seasons: seasons,
+      submitted: false,
+      firebaseId: null,
       attractionData: {
         name: "",
         county: "",
@@ -24,17 +30,16 @@ class AttractionForm extends Component {
     };
   }
   componentWillMount(){
-    const id = this.props.match.params.id;
-    if(id !== "new"){
-      this.populateForm(id);
-    }
+    if(this.id !== "add"){
+      this.populateForm(this.id);
+    } 
   }
   renderCounties() {
     const countyOptions = [];
     countyOptions.push(<option value="">----- none ------</option>);
     for (let key in this.state.counties) {
       countyOptions.push(
-        <option value={key}>{this.state.counties[key]}</option>
+        <option value={key} selected={this.state.attractionData.county===key}>{this.state.counties[key]}</option>
       );
     }
     return countyOptions;
@@ -73,7 +78,6 @@ class AttractionForm extends Component {
                     id="county"
                     name="county"
                     className="form-control"
-                    value={this.state.attractionData.county}
                     onChange={e => this.handleChange(e)}
                   >
                     {this.renderCounties()}
@@ -94,9 +98,8 @@ class AttractionForm extends Component {
                     id="description"
                     name="description"
                     onChange={e => this.handleChange(e)}
-                  >
-                    {this.state.attractionData.description}
-                  </textarea>
+                    value={this.state.attractionData.description}
+                  />
                 </div>
               </div>
 
@@ -173,26 +176,14 @@ class AttractionForm extends Component {
                   Rating
                 </label>
                 <div className="col-md-10">
-                  <label className="radio-inline" htmlFor="rating-0">
-                    <input type="radio" name="rating" id="rating-0" value="1" />
-                    1
-                  </label>
-                  <label className="radio-inline" htmlFor="rating-1">
-                    <input type="radio" name="rating" id="rating-1" value="2" />
-                    2
-                  </label>
-                  <label className="radio-inline" htmlFor="rating-2">
-                    <input type="radio" name="rating" id="rating-2" value="3" />
-                    3
-                  </label>
-                  <label className="radio-inline" htmlFor="rating-3">
-                    <input type="radio" name="rating" id="rating-3" value="4" />
-                    4
-                  </label>
-                  <label className="radio-inline" htmlFor="rating-4">
-                    <input type="radio" name="rating" id="rating-4" value="5" />
-                    5
-                  </label>
+                  <input 
+                    id="rating" 
+                    name="rating" 
+                    type="number"
+                    readOnly="true"
+                    className="form-control input-md"
+                    value={this.state.attractionData.rating}
+                    />
                 </div>
               </div>
 
@@ -206,9 +197,8 @@ class AttractionForm extends Component {
                     id="address"
                     name="address"
                     onChange={e => this.handleChange(e)}
-                  >
-                    {this.state.attractionData.address}
-                  </textarea>
+                    value={this.state.attractionData.address}
+                  />
                 </div>
               </div>
 
@@ -224,11 +214,7 @@ class AttractionForm extends Component {
                     multiple="multiple"
                     onChange={e => this.handleChange(e)}
                   >
-                    <option value="ANY">Any</option>
-                    <option value="SPRING">Spring</option>
-                    <option value="SUMMER">Summer</option>
-                    <option value="AUTUMN">Autumn</option>
-                    <option value="WINTER">Winter</option>
+                    {this.renderSeasons()}
                   </select>
                 </div>
               </div>
@@ -250,15 +236,115 @@ class AttractionForm extends Component {
     try {
       const snapshot = await this.database.ref("/attractions/" + id).once('value');
       const attraction  = snapshot.val();
-      // TODO:: finish this
-      // this.setState({attractionData: attraction});
+      this.setState({...this.state, firebaseId: id, attractionData: {...this.state.attractionData, ...attraction}});
     } catch(err) {
+      toastr.error(err);
       console.error(err);
     }
   }
-  handleSubmit(event) {
+  renderSeasons(){
+    const seasonArray = [];
+    for(let key in this.state.seasons){
+      seasonArray.push(<option value={key} selected={this.state.attractionData.season.includes(key)}>{seasons[key]}</option>);
+    }
+    return seasonArray;
+  }
+  handleSubmit = async event => {
     event.preventDefault();
-    console.log(this.state.attractionData.season);
+    if(this.state.submitted) return;
+    const attraction = this.state.attractionData;
+    if(this.validateAttraction(attraction)){
+      this.setState({submitted: true});
+      try{
+        const {
+          name,
+        county,
+        attractionId,
+        description,
+        image,
+        latitude,
+        longitude,
+        rating,
+        address,
+        season
+        } = attraction;
+        let validatedAttraction = {
+          name,
+          county,
+          attractionId,
+          description,
+          image,
+          latitude,
+          longitude,
+          rating,
+          address,
+          season
+        };
+        // we update
+        if(this.id !== "add"){
+          await this.database.ref("/attractions/" + this.state.firebaseId).update(validatedAttraction);
+          toastr.success(`Successfully updated ${attraction.name}!`);
+        } else {
+          // we add
+          // Get the item with highest attraction id and set the new item's id to 1 over that
+          const last = await this.database.ref('attractions').orderByChild("attractionId").limitToLast(1).once("value");
+          validatedAttraction.attractionId = this.getAttractionId(last);
+          await this.database.ref("/attractions").push(validatedAttraction);
+          toastr.success(`Successfully added ${attraction.name}!`);
+        } 
+        this.setState({submitted: false});
+      } catch(e){
+        toastr.error(e.toString());
+      }
+    }
+  }
+  getAttractionId = dataSnapshot => {
+    let attractionId = -1;
+    const data = dataSnapshot.val();
+    for(let key in data){
+      attractionId = data[key].attractionId;
+    }
+    if(attractionId === -1){
+      return 1;
+    } else {
+      return attractionId + 1;
+    }
+  }
+  validateAttraction(attraction){
+    let valid = true;
+    if(typeof attraction.name !== "string" || attraction.name.length <= 1){
+      valid = false;
+      toastr.error("Name should exist and have a length of over 1");
+    }
+    if(typeof attraction.county !== "string" || typeof this.state.counties[attraction.county] === "undefined"){
+      valid = false;
+      toastr.error("County should be set and be part of the counties of Romania");
+    }
+    if(typeof attraction.description !== "string" || attraction.description.length <= 1){
+      valid = false;
+      toastr.error("Description should exist and have a length of over 1");
+    }
+    if(typeof attraction.address !== "string" || attraction.address.length <= 1){
+      valid = false;
+      toastr.error("Address should be set and have a length of over 1");
+    }
+    if(attraction.season.length < 1){
+      valid = false;
+      toastr.error("Attraction should have at least one season during which it can be visited");
+    }
+    if(typeof attraction.latitude !== "number"){
+      valid = false;
+      toastr.error("Latitude should be a number");
+    }
+    if(typeof attraction.longitude !== "number"){
+      valid = false;
+      toastr.error("Longitude should be a number");
+    }
+    if(typeof attraction.rating !== "number"){
+      valid = false;
+      toastr.error("Rating should be a number");
+    }
+    return valid;
   }
   handleChange(event) {
     const target = event.target;

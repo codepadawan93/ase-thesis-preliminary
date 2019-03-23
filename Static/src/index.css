@@ -21,3 +21,35 @@
 .sc-message--content.sent .sc-message--text{
     background-color: #007bff !important;
 }
+
+.navbar-text {
+    padding: 5px;
+    font-size: 1rem;
+}
+
+.navbar .btn {
+    margin: 2px;
+}
+
+.spacer {
+    height: 100px;
+  }
+  
+  .toolbox {
+    position: fixed;
+    left: 12px;
+    bottom: 12px;
+    z-index: 10;
+  }
+
+  .rating-stars {
+    font-size: 1.3rem;
+  }
+  
+  .golden {
+    color: #f8ce0b;
+  }
+  
+  .scores-message {
+    z-index: 1;
+  }

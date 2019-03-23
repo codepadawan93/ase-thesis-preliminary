@@ -13,13 +13,27 @@ import Dashboard from "./adminComponents/Dashboard";
 import AttractionForm from "./adminComponents/AttractionForm";
 import AttractionList from "./adminComponents/AttractionList";
 import BreadcrumbArea from "./adminComponents/BreadcrumbArea";
+import firebase from "firebase";
 
 class Admin extends Component {
   constructor() {
     super();
     this.state = {
-      shouldRedirect: false
+      shouldRedirect: false,
+      redirectTo: "/"
     };
+  }
+  componentWillMount(){
+    // Redirect if not me. I know...
+    firebase.auth().onAuthStateChanged(user => {
+      let shouldRedirect = true;
+      if(user){
+        if(user.uid === "ACm5e6uGbvSjHmxGam3Ic7f9IAj1"){
+          shouldRedirect = false;
+        }
+      }
+      this.setState({shouldRedirect: shouldRedirect});
+    })
   }
   render() {
     return (

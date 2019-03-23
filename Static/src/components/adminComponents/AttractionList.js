@@ -90,7 +90,7 @@ class AttractionList extends Component {
       this.setState({
         items: this.state.items.filter(item => item.list_id !== id)
       });
-      alert("TODO!!!");
+      alert(`Clicked item with id = ${id}`);
     }
   };
 
