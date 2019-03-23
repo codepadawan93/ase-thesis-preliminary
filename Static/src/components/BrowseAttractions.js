@@ -26,7 +26,7 @@ class BrowseAttractions extends Component {
   render() {
     return (
       <div className="row">
-        <div className="col-md-12">
+        <div className="col-md-10 offset-md-1">
           {this.renderScoresMessage()}
           <h1 ref={this.currentRef} className="panel">
             Complete your survey

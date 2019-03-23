@@ -10,6 +10,7 @@ const path = require("path");
 
 // If an api key does not exist, create it
 CredManager.createServiceAccountJson();
+CredManager.createConfigJson();
 
 const server = Express();
 
