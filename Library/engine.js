@@ -5,7 +5,7 @@ const Utils = require("./utils");
 class Engine {
   constructor() {
     this.cutoffValue = 0.1;
-    this.KEYWORD_LENGTH = 5;
+    this.KEYWORD_LENGTH = 15;
   }
 
   fit(ratings, items) {
@@ -108,15 +108,16 @@ class Engine {
       const tfidf = new TFIDF();
 
       const description = Utils.replaceInvalidChars(
-        this.attractionsArray[i].description
+        this.attractionsArray[i].name + " " + this.attractionsArray[i].description
       );
+      
       tfidf.termFreq(description);
       let docCount = 0;
       // Iterate again
       for (let j = 0; j < this.attractionsArray.length; j++) {
         // count IDF
         const _description = Utils.replaceInvalidChars(
-          this.attractionsArray[j].description
+          this.attractionsArray[j].name + " " + this.attractionsArray[j].description
         );
         tfidf.docFreq(_description);
 
@@ -129,7 +130,7 @@ class Engine {
           docCount = 0;
         }
       }
-      const keywords = tfidf.getKeys().slice(0, 10); //this.KEYWORD_LENGTH);
+      const keywords = tfidf.getKeys().slice(0, this.KEYWORD_LENGTH);
       this.attractionsArray[i].keywords = keywords;
       keywords.map(k => {
         // Beautiful type checking js

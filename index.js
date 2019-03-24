@@ -232,7 +232,7 @@ const basicAuthConfig = {
 // Set username/pass fron env variables
 basicAuthConfig.users[process.env.ADMIN_USERNAME] = process.env.ADMIN_PASSWORD;
 // Comment during local dev
-server.use(basicAuth(basicAuthConfig));
+// server.use(basicAuth(basicAuthConfig));
 
 /**
  * Then handle direct requests
