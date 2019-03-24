@@ -8,7 +8,7 @@
     "start-dev": "node_modules/.bin/nodemon index.js",
     "install-client": "cd Static && npm install && exit 0",
     "build-client": "cd Static && npm run build && exit 0",
-    "heroku-postbuild": "node create-creds.js && cd Static && npm install && npm build && exit 0",
+    "heroku-postbuild": "node create-creds.js && cd Static && npm install && npm run build && exit 0",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
