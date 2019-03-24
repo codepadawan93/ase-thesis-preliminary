@@ -1,7 +1,7 @@
 const CredManager = require("./Library/cred-manager");
 const Bot = require("./Bot/bot");
 const Recommender = require("./Library/recommender");
-const Express = require("express");
+const express = require("express");
 const basicAuth = require("express-basic-auth");
 const bodyParser = require("body-parser");
 const messageTypes = require("./Models/messageTypes");
@@ -9,10 +9,7 @@ const request = require("request");
 const path = require("path");
 
 // If an api key does not exist, create it
-// CredManager.createServiceAccountJson();
-// CredManager.createConfigJson();
-
-const server = Express();
+const server = express();
 
 const firebase = require("firebase-admin");
 const serviceAccount = require(CredManager.SERVICE_ACCOUNT_JSON_PATH());
@@ -23,7 +20,7 @@ firebase.initializeApp({
 const ref = firebase.database().ref();
 
 server.use(bodyParser.json());
-server.use(Express.static("./Static/build"));
+server.use(express.static("./Static/build/"));
 
 let recommender = null;
 let bot = new Bot({
@@ -257,9 +254,14 @@ server.get(["/api", "/api/:message"], async (req, res) => {
 });
 
 // Reroute everything else to client app
-server.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "Static/build", "index.html"));
-});
+server.get('/*', (req, res) => {
+  res.set("Content-Type", "text/html");
+  res.status(200).sendFile(path.join(__dirname, 'Static', 'build', 'index.html'), (err) => {
+    if (err) {
+      res.status(500).send(err);
+    }
+  });
+})
 
 // Start server
 server.listen(process.env.PORT || 8080, async function() {
