@@ -107,8 +107,9 @@ class Engine {
     for (let i = 0; i < this.attractionsArray.length; i++) {
       const tfidf = new TFIDF();
 
+      const attraction = this.attractionsArray[i];
       const description = Utils.replaceInvalidChars(
-        this.attractionsArray[i].name + " " + this.attractionsArray[i].description
+        `${attraction.name} ${attraction.county} ${attraction.description}`
       );
       
       tfidf.termFreq(description);
@@ -116,8 +117,9 @@ class Engine {
       // Iterate again
       for (let j = 0; j < this.attractionsArray.length; j++) {
         // count IDF
+        const _attraction = this.attractionsArray[j];
         const _description = Utils.replaceInvalidChars(
-          this.attractionsArray[j].name + " " + this.attractionsArray[j].description
+          `${_attraction.name} ${_attraction.county} ${_attraction.description}`
         );
         tfidf.docFreq(_description);
 

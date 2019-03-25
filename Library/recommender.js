@@ -31,7 +31,7 @@ class Recommender {
     const type = parts[0];
     let term = parts[1] || "";
     term = Utils.replaceInvalidChars(term);
-
+   
     // Respond differently as a function of the event type
     switch (type) {
       case "expression.attribution.username":
@@ -52,12 +52,22 @@ class Recommender {
       case "query.image.term":
         return "TODO";
 
+      case "query.category.term":
+        return this.informCategoryByTerm(term);
+
+      case "query.map.term":
+        return this.getMapByTerm(term);
+
+      case "query.season.term":
+        return this.getSeasonByTerm(term);
+
       default:
         // by default the event is just a natural language reply
         return event;
     }
   }
 
+  
   setUserName(userName) {
     // Sets the user name of the user. This is bad because it basically
     // limits the number of sessions to only one. Similarly the user is
@@ -71,10 +81,60 @@ class Recommender {
       return `Sorry but I do not know of any ${userName}. Maybe you have not been a customer before, or have you misspelt your username?`;
     }
   }
+  
+  getSeasonByTerm(term){
+    let recommendations = this.engine.getRecommendationsByKeyWord(term);
+    if (recommendations.length > 0) {
+      return `You can visit ${recommendations[0].name} during ` + recommendations[0].season.map(s => s.toLowerCase()).join(", ");
+    } else {
+      recommendations = this.engine.attractionsArray.filter(
+        attraction => attraction.category.includes(term)
+      );
+    }
+    if (recommendations.length > 0) {
+      return `You can visit ${recommendations[0].name} during ` + recommendations[0].season.map(s => s.toLowerCase()).join(", ");
+    } else {
+      return `I found no relevant data on ${term}`;
+    }
+  }
+
+  getMapByTerm(term){
+    let recommendations = this.engine.getRecommendationsByKeyWord(term);
+    if (recommendations.length > 0) {
+      const rec = recommendations[0];
+      return `https://maps.google.com/maps?q=${rec.latitude},${rec.longitude}&hl=en&z=9&output=embed`;
+    } else {
+      recommendations = this.engine.attractionsArray.filter(
+        attraction => attraction.category.includes(term)
+      );
+    }
+    if (recommendations.length > 0) {
+      const rec = recommendations[0];
+      return `https://maps.google.com/maps?q=${rec.latitude},${rec.longitude}&hl=en&z=9&output=embed`;;
+    } else {
+      return `I found no relevant data on ${term}`;
+    }
+  }
+
+  informCategoryByTerm(term){
+    let recommendations = this.engine.getRecommendationsByKeyWord(term);
+    if (recommendations.length > 0) {
+      return recommendations[0].category;
+    } else {
+      recommendations = this.engine.attractionsArray.filter(
+        attraction => attraction.name.includes(term) || attraction.description.includes(term)
+      );
+    }
+    if (recommendations.length > 0) {
+      return recommendations[0].category;
+    } else {
+      return `I found no relevant data on ${term}`;
+    }
+  }
 
   recommendTerm(term) {
     // Get a list of recommendations from the engine
-    const recommendations = this.engine.getRecommendationsByKeyWord(term);
+    let recommendations = this.engine.getRecommendationsByKeyWord(term);
     let recommendationsString = "";
     if (recommendations.length > 0) {
       recommendationsString = recommendations
