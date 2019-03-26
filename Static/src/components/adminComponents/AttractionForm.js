@@ -332,15 +332,15 @@ class AttractionForm extends Component {
       valid = false;
       toastr.error("Attraction should have at least one season during which it can be visited");
     }
-    if(typeof attraction.latitude !== "number"){
+    if(typeof parseFloat(attraction.latitude) !== "number"){
       valid = false;
       toastr.error("Latitude should be a number");
     }
-    if(typeof attraction.longitude !== "number"){
+    if(typeof parseFloat(attraction.longitude) !== "number"){
       valid = false;
       toastr.error("Longitude should be a number");
     }
-    if(typeof attraction.rating !== "number"){
+    if(typeof parseFloat(attraction.rating) !== "number"){
       valid = false;
       toastr.error("Rating should be a number");
     }
