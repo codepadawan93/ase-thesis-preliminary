@@ -4,8 +4,49 @@ const Utils = require("./utils");
 
 class Engine {
   constructor() {
-    this.cutoffValue = 0.1;
+    this.cutoffValue = 0.01;
     this.KEYWORD_LENGTH = 15;
+    this.filterBySeason - false;
+
+    // Cache the season rules
+    /**
+     * Spring runs from March 1 to May 31;
+     * Summer runs from June 1 to August 31;
+     * Fall (autumn) runs from September 1 to November 30; and
+     * Winter runs from December 1 to February 28 (February 29 in a leap year).
+     */
+    const year = new Date().getFullYear();
+    this.seasons = {
+      ANY: {
+        name: "Any",
+        from: new Date(year, 0, 1),
+        to: new Date(year, 11, 31)
+      },
+      SPRING: {
+        name: "Spring",
+        from: new Date(year, 2, 1),
+        to: new Date(year, 4, 31)
+      },
+      SUMMER: {
+        name: "Summer",
+        from: new Date(year, 5, 1),
+        to: new Date(year, 7, 31)
+      },
+      AUTUMN: {
+        name: "Autumn",
+        from: new Date(year, 8, 1),
+        to: new Date(year, 10, 30)
+      },
+      WINTER: {
+        name: "Winter",
+        from: new Date(year, 8, 1),
+        to: new Date(year, 10, 30)
+      },
+    };
+  }
+
+  setFilterBySeason(value){
+    this.filterBySeason = value;
   }
 
   fit(ratings, items) {
@@ -71,6 +112,16 @@ class Engine {
     return this;
   }
 
+  _getSeason(){
+    const date = new Date();
+    for(let key in this.seasons){
+      if(key === "ANY") continue;
+      if(this.seasons[key].from <= date && date <= this.seasons[key].to){
+        return key;
+      }
+    }
+  }
+
   _calculateSimilarities() {
     let sumSimilarity = 0;
     // Traverse the matrix row by row and calculate similarity with all other rows
@@ -84,16 +135,19 @@ class Engine {
         }
         const b = this.matrix[j];
         const similarity = maths.calculateCosineSimilarity(a, b);
+
         userSimilarity.to.push({
           userName: this.rows[j],
           similarity: similarity
         });
+
         sumSimilarity += similarity;
       }
       // sort ascendingly
       userSimilarity.to.sort((a, b) => {
         return b.similarity - a.similarity;
       });
+
       this.similarities.push(userSimilarity);
     }
     // Cutoff value is the mean similarity
@@ -155,6 +209,7 @@ class Engine {
     const user = this.similarities
       .filter(similarity => similarity.userName === userName)
       .reduce(similarity => similarity);
+
     user.to
       .filter(_user => _user.similarity > this.cutoffValue)
       .map(similar => {
@@ -171,11 +226,16 @@ class Engine {
 
     // map over recommendations and pull in the needed data
     attractionIds.forEach(attractionId => {
+      console.log(typeof attractionId)
       const item = this.attractionsArray
         .filter(_item => _item.attractionId === attractionId)
         .reduce(_item => _item);
       this.recommendations.push(item);
     });
+
+    if(this.filterBySeason === true){
+      this._filterBySeason();
+    }
     return this;
   }
 
@@ -184,7 +244,7 @@ class Engine {
     const userName = Buffer.from(new Date().getTime() + "").toString("base64");
     ratings.userName = userName;
     this.ratings.NEW_KEY = ratings;
-
+    
     // fit the model again
     this.fit(this.ratings, this.items)
       ._calculateSimilarities()
@@ -220,6 +280,14 @@ class Engine {
         return [];
       }
     }
+  }
+  _filterBySeason(){
+    const season = this._getSeason();
+    this.recommendations = this.recommendations
+    .filter(_item => {
+      return _item.season.indexOf(season) > -1 || _item.season.indexOf("ANY") > -1
+    })
+    return this;
   }
 }
 

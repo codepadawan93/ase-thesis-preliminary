@@ -1,4 +1,3 @@
-const fs = require("fs");
 const Engine = require("./engine");
 const Utils = require("./utils");
 
@@ -6,7 +5,7 @@ class Recommender {
   constructor(firebaseRef) {
     this.engine = new Engine();
     this.userName = null;
-
+    
     // refactor...
     this.responsesRef = firebaseRef.child("responses");
     this.attractionsRef = firebaseRef.child("attractions");
@@ -22,9 +21,12 @@ class Recommender {
 
     // Then build the model
     ret.engine.fit(ret.responses, ret.attractions);
+    
+    // Either filter by season or dont
+    ret.engine.setFilterBySeason(true);
     return ret;
   }
-
+  
   parse(event) {
     // interpret the event and get the value
     const parts = event.split(/=/);
@@ -38,7 +40,7 @@ class Recommender {
         return this.setUserName(term);
 
       case "query.recommend.term":
-        return "TODO";
+        return this.getDataTerm(term);
 
       case "query.recommend.all":
         return this.recommendAll();
@@ -98,14 +100,32 @@ class Recommender {
     }
   }
 
+  getDataTerm(term){
+    let recommendations = this.engine.getRecommendationsByKeyWord(term);
+    if (recommendations.length > 0) {
+      const rec = recommendations[0];
+      return `${rec.name}\n${rec.season.join(", ")}\n${rec.category}\n${rec.latitude},${rec.longitude}`;
+    } else {
+      recommendations = this.engine.attractionsArray.filter(
+        attraction => attraction.category.includes(term)
+      );
+    }
+    if (recommendations.length > 0) {
+      return `${rec.name}\n${rec.season.join(", ")}\n${rec.category}\n${rec.latitude},${rec.longitude}`;
+    } else {
+      return `I found no relevant data on ${term}`;
+    }
+  }
+
   getMapByTerm(term){
     let recommendations = this.engine.getRecommendationsByKeyWord(term);
+    recommendations = recommendations.filter(r => r.latitude !== 0 && r.longitude !== 0);
     if (recommendations.length > 0) {
       const rec = recommendations[0];
       return `https://maps.google.com/maps?q=${rec.latitude},${rec.longitude}&hl=en&z=9`;
     } else {
       recommendations = this.engine.attractionsArray.filter(
-        attraction => attraction.category.includes(term)
+        attraction => attraction.category.includes(term) && attraction.latitude !== 0 && attraction.longitude !== 0
       );
     }
     if (recommendations.length > 0) {
@@ -166,14 +186,413 @@ class Recommender {
   }
 
   recommendAll() {
+    const testData = {
+      "scores" : [ {
+        "attractionId" : "15",
+        "rating" : 1
+      }, {
+        "attractionId" : "16",
+        "rating" : 1
+      }, {
+        "attractionId" : "17",
+        "rating" : 1
+      }, {
+        "attractionId" : "21",
+        "rating" : 1
+      }, {
+        "attractionId" : "31",
+        "rating" : 1
+      }, {
+        "attractionId" : "32",
+        "rating" : 1
+      }, {
+        "attractionId" : "34",
+        "rating" : 1
+      }, {
+        "attractionId" : "35",
+        "rating" : 1
+      }, {
+        "attractionId" : "36",
+        "rating" : 1
+      }, {
+        "attractionId" : "38",
+        "rating" : 1
+      }, {
+        "attractionId" : "56",
+        "rating" : 1
+      }, {
+        "attractionId" : "60",
+        "rating" : 1
+      }, {
+        "attractionId" : "66",
+        "rating" : 1
+      }, {
+        "attractionId" : "141",
+        "rating" : 1
+      }, {
+        "attractionId" : "142",
+        "rating" : 1
+      }, {
+        "attractionId" : "146",
+        "rating" : 1
+      }, {
+        "attractionId" : "151",
+        "rating" : 1
+      }, {
+        "attractionId" : "152",
+        "rating" : 1
+      }, {
+        "attractionId" : "153",
+        "rating" : 1
+      }, {
+        "attractionId" : "154",
+        "rating" : 1
+      }, {
+        "attractionId" : "175",
+        "rating" : 1
+      }, {
+        "attractionId" : "176",
+        "rating" : 1
+      }, {
+        "attractionId" : "187",
+        "rating" : 1
+      }, {
+        "attractionId" : "188",
+        "rating" : 1
+      }, {
+        "attractionId" : "190",
+        "rating" : 1
+      }, {
+        "attractionId" : "208",
+        "rating" : 1
+      }, {
+        "attractionId" : "230",
+        "rating" : 1
+      }, {
+        "attractionId" : "232",
+        "rating" : 1
+      }, {
+        "attractionId" : "235",
+        "rating" : 1
+      }, {
+        "attractionId" : "262",
+        "rating" : 1
+      }, {
+        "attractionId" : "263",
+        "rating" : 1
+      }, {
+        "attractionId" : "264",
+        "rating" : 1
+      }, {
+        "attractionId" : "284",
+        "rating" : 1
+      }, {
+        "attractionId" : "334",
+        "rating" : 1
+      }, {
+        "attractionId" : "335",
+        "rating" : 1
+      }, {
+        "attractionId" : "336",
+        "rating" : 1
+      }, {
+        "attractionId" : "352",
+        "rating" : 1
+      }, {
+        "attractionId" : "353",
+        "rating" : 1
+      }, {
+        "attractionId" : "354",
+        "rating" : 1
+      }, {
+        "attractionId" : "355",
+        "rating" : 1
+      }, {
+        "attractionId" : "357",
+        "rating" : 1
+      }, {
+        "attractionId" : "361",
+        "rating" : 1
+      }, {
+        "attractionId" : "391",
+        "rating" : 1
+      }, {
+        "attractionId" : "402",
+        "rating" : 1
+      }, {
+        "attractionId" : "406",
+        "rating" : 1
+      }, {
+        "attractionId" : "407",
+        "rating" : 1
+      }, {
+        "attractionId" : "408",
+        "rating" : 1
+      }, {
+        "attractionId" : "409",
+        "rating" : 1
+      }, {
+        "attractionId" : "410",
+        "rating" : 1
+      }, {
+        "attractionId" : "412",
+        "rating" : 1
+      }, {
+        "attractionId" : "413",
+        "rating" : 1
+      }, {
+        "attractionId" : "419",
+        "rating" : 1
+      }, {
+        "attractionId" : "450",
+        "rating" : 1
+      }, {
+        "attractionId" : "463",
+        "rating" : 1
+      }, {
+        "attractionId" : "485",
+        "rating" : 1
+      }, {
+        "attractionId" : "487",
+        "rating" : 1
+      }, {
+        "attractionId" : "489",
+        "rating" : 1
+      }, {
+        "attractionId" : "495",
+        "rating" : 1
+      }, {
+        "attractionId" : "502",
+        "rating" : 1
+      }, {
+        "attractionId" : "506",
+        "rating" : 1
+      }, {
+        "attractionId" : "507",
+        "rating" : 1
+      }, {
+        "attractionId" : "508",
+        "rating" : 1
+      }, {
+        "attractionId" : "509",
+        "rating" : 1
+      }, {
+        "attractionId" : "511",
+        "rating" : 1
+      }, {
+        "attractionId" : "522",
+        "rating" : 1
+      }, {
+        "attractionId" : "521",
+        "rating" : 1
+      }, {
+        "attractionId" : "524",
+        "rating" : 1
+      }, {
+        "attractionId" : "526",
+        "rating" : 1
+      }, {
+        "attractionId" : "535",
+        "rating" : 1
+      }, {
+        "attractionId" : "547",
+        "rating" : 1
+      }, {
+        "attractionId" : "548",
+        "rating" : 1
+      }, {
+        "attractionId" : "549",
+        "rating" : 1
+      }, {
+        "attractionId" : "550",
+        "rating" : 1
+      }, {
+        "attractionId" : "561",
+        "rating" : 1
+      }, {
+        "attractionId" : "562",
+        "rating" : 1
+      }, {
+        "attractionId" : "566",
+        "rating" : 1
+      }, {
+        "attractionId" : "638",
+        "rating" : 1
+      }, {
+        "attractionId" : "639",
+        "rating" : 1
+      }, {
+        "attractionId" : "640",
+        "rating" : 1
+      }, {
+        "attractionId" : "641",
+        "rating" : 1
+      }, {
+        "attractionId" : "643",
+        "rating" : 1
+      }, {
+        "attractionId" : "644",
+        "rating" : 1
+      }, {
+        "attractionId" : "654",
+        "rating" : 1
+      }, {
+        "attractionId" : "656",
+        "rating" : 1
+      }, {
+        "attractionId" : "658",
+        "rating" : 1
+      }, {
+        "attractionId" : "659",
+        "rating" : 1
+      }, {
+        "attractionId" : "663",
+        "rating" : 1
+      }, {
+        "attractionId" : "668",
+        "rating" : 1
+      }, {
+        "attractionId" : "675",
+        "rating" : 1
+      }, {
+        "attractionId" : "677",
+        "rating" : 1
+      }, {
+        "attractionId" : "683",
+        "rating" : 1
+      }, {
+        "attractionId" : "691",
+        "rating" : 1
+      }, {
+        "attractionId" : "719",
+        "rating" : 1
+      }, {
+        "attractionId" : "720",
+        "rating" : 1
+      }, {
+        "attractionId" : "727",
+        "rating" : 1
+      }, {
+        "attractionId" : "756",
+        "rating" : 1
+      }, {
+        "attractionId" : "758",
+        "rating" : 1
+      }, {
+        "attractionId" : "804",
+        "rating" : 1
+      }, {
+        "attractionId" : "843",
+        "rating" : 1
+      }, {
+        "attractionId" : "844",
+        "rating" : 1
+      }, {
+        "attractionId" : "901",
+        "rating" : 1
+      }, {
+        "attractionId" : "903",
+        "rating" : 1
+      }, {
+        "attractionId" : "943",
+        "rating" : 1
+      }, {
+        "attractionId" : "947",
+        "rating" : 1
+      }, {
+        "attractionId" : "948",
+        "rating" : 1
+      }, {
+        "attractionId" : "957",
+        "rating" : 1
+      }, {
+        "attractionId" : "966",
+        "rating" : 1
+      }, {
+        "attractionId" : "1053",
+        "rating" : 1
+      }, {
+        "attractionId" : "1054",
+        "rating" : 1
+      }, {
+        "attractionId" : "1057",
+        "rating" : 1
+      }, {
+        "attractionId" : "1059",
+        "rating" : 1
+      }, {
+        "attractionId" : "1060",
+        "rating" : 1
+      }, {
+        "attractionId" : "1061",
+        "rating" : 1
+      }, {
+        "attractionId" : "1066",
+        "rating" : 1
+      }, {
+        "attractionId" : "1067",
+        "rating" : 1
+      }, {
+        "attractionId" : "1068",
+        "rating" : 1
+      }, {
+        "attractionId" : "1069",
+        "rating" : 1
+      }, {
+        "attractionId" : "1070",
+        "rating" : 1
+      }, {
+        "attractionId" : "1071",
+        "rating" : 1
+      }, {
+        "attractionId" : "1072",
+        "rating" : 1
+      }, {
+        "attractionId" : "1081",
+        "rating" : 1
+      }, {
+        "attractionId" : "1101",
+        "rating" : 1
+      }, {
+        "attractionId" : "1106",
+        "rating" : 1
+      }, {
+        "attractionId" : "1130",
+        "rating" : 1
+      }, {
+        "attractionId" : "1131",
+        "rating" : 1
+      }, {
+        "attractionId" : "1141",
+        "rating" : 1
+      }, {
+        "attractionId" : "1159",
+        "rating" : 1
+      }, {
+        "attractionId" : "1172",
+        "rating" : 1
+      }, {
+        "attractionId" : "1189",
+        "rating" : 1
+      }, {
+        "attractionId" : "1228",
+        "rating" : 1
+      }, {
+        "attractionId" : "1231",
+        "rating" : 1
+      } 
+    ]};
     const { recommendations } = this.userName
       ? this.engine.getRecommendationForExisting(this.userName)
-      : this.engine.getRecommendationForNew({});
-    const recommendationsString = recommendations
-      .map(r => r.name)
-      .slice(0, 10)
-      .join("\n");
-    return recommendationsString;
+      : this.engine.getRecommendationForNew(testData);
+    if(recommendations.length > 0){
+      return recommendations
+        .map(r => r.name)
+        .slice(0, 10)
+        .join("\n");
+    } else {
+      return "I have no suggestions for you";
+    }
   }
 }
 

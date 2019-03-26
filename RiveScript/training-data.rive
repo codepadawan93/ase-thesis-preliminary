@@ -645,13 +645,13 @@
 - query.image.term=<star3>
 
 + [*] what is (in|at|near) * [*]
-- query.category.term=<star2>
+- query.category.term=<star1>
 
 + [*] where is * [*]
-- query.map.term=<star2>
+- query.map.term=<star1>
 
 + [*] locate * [*]
-- query.map.term=<star2>
+- query.map.term=<star1>
 
 + [*] when can (i|we) (visit|go to|travel to) * [*]
 - query.season.term=<star3>
