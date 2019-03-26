@@ -102,7 +102,7 @@ class Recommender {
     let recommendations = this.engine.getRecommendationsByKeyWord(term);
     if (recommendations.length > 0) {
       const rec = recommendations[0];
-      return `https://maps.google.com/maps?q=${rec.latitude},${rec.longitude}&hl=en&z=9&output=embed`;
+      return `https://maps.google.com/maps?q=${rec.latitude},${rec.longitude}&hl=en&z=9`;
     } else {
       recommendations = this.engine.attractionsArray.filter(
         attraction => attraction.category.includes(term)
@@ -110,7 +110,7 @@ class Recommender {
     }
     if (recommendations.length > 0) {
       const rec = recommendations[0];
-      return `https://maps.google.com/maps?q=${rec.latitude},${rec.longitude}&hl=en&z=9&output=embed`;;
+      return `https://maps.google.com/maps?q=${rec.latitude},${rec.longitude}&hl=en&z=9`;;
     } else {
       return `I found no relevant data on ${term}`;
     }
