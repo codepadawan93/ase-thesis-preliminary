@@ -7,6 +7,7 @@ const bodyParser = require("body-parser");
 const messageTypes = require("./Models/messageTypes");
 const request = require("request");
 const path = require("path");
+const Logger = require("./Library/logger");
 
 // If an api key does not exist, create it
 const server = express();
@@ -22,6 +23,7 @@ const ref = firebase.database().ref();
 server.use(bodyParser.json());
 server.use(express.static("./Static/build/"));
 
+let logger = new Logger(ref);
 let recommender = null;
 let bot = new Bot({
   file: "./RiveScript/training-data.rive",
@@ -100,6 +102,10 @@ async function handleMessage(sender_psid, received_message) {
     try {
       let reply = await bot.ask(received_message.text);
       reply = recommender.parse(reply);
+      logger.logConversation(sender_psid);
+
+      // TODO:: reply will be an object, and if a flag will be set, a number of
+      // attractions will be sent for rating by the user
 
       // Create the payload for a basic text message, which
       // will be added to the body of our request to the Send API
@@ -239,6 +245,7 @@ server.get(["/api", "/api/:message"], async (req, res) => {
   try {
     let reply = await bot.ask(req.params.message);
     reply = recommender.parse(reply);
+    logger.logConversation(req.ip);
     res.status(200).json({
       success: true,
       type: messageTypes.plain,
@@ -254,14 +261,16 @@ server.get(["/api", "/api/:message"], async (req, res) => {
 });
 
 // Reroute everything else to client app
-server.get('/*', (req, res) => {
+server.get("/*", (req, res) => {
   res.set("Content-Type", "text/html");
-  res.status(200).sendFile(path.join(__dirname, 'Static', 'build', 'index.html'), (err) => {
-    if (err) {
-      res.status(500).send(err);
-    }
-  });
-})
+  res
+    .status(200)
+    .sendFile(path.join(__dirname, "Static", "build", "index.html"), err => {
+      if (err) {
+        res.status(500).send(err);
+      }
+    });
+});
 
 // Start server
 server.listen(process.env.PORT || 8080, async function() {

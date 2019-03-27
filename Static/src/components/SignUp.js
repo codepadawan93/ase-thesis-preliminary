@@ -167,7 +167,15 @@ class SignUp extends Component {
           .auth()
           .createUserWithEmailAndPassword(userName, pass);
 
-        if (res.user) {
+        if (res.user.uid) {
+          await firebase
+            .database()
+            .ref(`users/${res.user.uid}`)
+            .set({
+              firstName,
+              lastName,
+              createdAt: Date()
+            });
           this.setMessages(["User successfully added!"]);
           this.setState({
             ...this.state,

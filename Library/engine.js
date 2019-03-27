@@ -41,11 +41,11 @@ class Engine {
         name: "Winter",
         from: new Date(year, 8, 1),
         to: new Date(year, 10, 30)
-      },
+      }
     };
   }
 
-  setFilterBySeason(value){
+  setFilterBySeason(value) {
     this.filterBySeason = value;
   }
 
@@ -112,11 +112,11 @@ class Engine {
     return this;
   }
 
-  _getSeason(){
+  _getSeason() {
     const date = new Date();
-    for(let key in this.seasons){
-      if(key === "ANY") continue;
-      if(this.seasons[key].from <= date && date <= this.seasons[key].to){
+    for (let key in this.seasons) {
+      if (key === "ANY") continue;
+      if (this.seasons[key].from <= date && date <= this.seasons[key].to) {
         return key;
       }
     }
@@ -165,7 +165,7 @@ class Engine {
       const description = Utils.replaceInvalidChars(
         `${attraction.name} ${attraction.county} ${attraction.description}`
       );
-      
+
       tfidf.termFreq(description);
       let docCount = 0;
       // Iterate again
@@ -226,14 +226,13 @@ class Engine {
 
     // map over recommendations and pull in the needed data
     attractionIds.forEach(attractionId => {
-      console.log(typeof attractionId)
       const item = this.attractionsArray
         .filter(_item => _item.attractionId === attractionId)
         .reduce(_item => _item);
       this.recommendations.push(item);
     });
 
-    if(this.filterBySeason === true){
+    if (this.filterBySeason === true) {
       this._filterBySeason();
     }
     return this;
@@ -244,7 +243,7 @@ class Engine {
     const userName = Buffer.from(new Date().getTime() + "").toString("base64");
     ratings.userName = userName;
     this.ratings.NEW_KEY = ratings;
-    
+
     // fit the model again
     this.fit(this.ratings, this.items)
       ._calculateSimilarities()
@@ -281,12 +280,13 @@ class Engine {
       }
     }
   }
-  _filterBySeason(){
+  _filterBySeason() {
     const season = this._getSeason();
-    this.recommendations = this.recommendations
-    .filter(_item => {
-      return _item.season.indexOf(season) > -1 || _item.season.indexOf("ANY") > -1
-    })
+    this.recommendations = this.recommendations.filter(_item => {
+      return (
+        _item.season.indexOf(season) > -1 || _item.season.indexOf("ANY") > -1
+      );
+    });
     return this;
   }
 }
