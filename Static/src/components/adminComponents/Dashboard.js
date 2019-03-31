@@ -44,6 +44,7 @@ class PageContent extends Component {
     ];
     this.state = {
       data: [],
+      termsData: [],
       attractionsNum: 0,
       usersNum: 0,
       responsesNum: 0,
@@ -74,6 +75,12 @@ class PageContent extends Component {
           dataArray.push({ name: key, value: frequencyMap[key] });
         }
       }
+      const termDataArray = [];
+      for (let key in val.terms) {
+        termDataArray.push({ name: key, value: val.terms[key].frequency });
+      }
+      termDataArray.sort((a, b) => a.frequency - b.frequency);
+
       for (let key in val.responses) {
         responsesNum++;
       }
@@ -83,8 +90,10 @@ class PageContent extends Component {
       for (let key in val.users) {
         usersNum++;
       }
+
       this.setState({
         data: dataArray,
+        termsData: termDataArray.slice(0, 5),
         attractionsNum,
         usersNum,
         responsesNum,
@@ -171,9 +180,9 @@ class PageContent extends Component {
             </ResponsiveContainer>
           </div>
           <div className="col-md-6">
-            <h4>Attractions by category</h4>
+            <h4>Popular queries</h4>
             <ResponsiveContainer width="100%" height={350}>
-              <BarChart width="100%" height={350} data={this.state.data}>
+              <BarChart width="100%" height={350} data={this.state.termsData}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />
                 <YAxis />

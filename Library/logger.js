@@ -15,6 +15,29 @@ class Logger {
     }
   }
 
+  async logTerm(term) {
+    if (!term) return;
+    try {
+      const dataSnapshot = await this.database
+        .child(`terms/${term}`)
+        .once("value");
+      const val = dataSnapshot.val();
+      if (val == null) {
+        this.database.child(`terms/${term}`).set({
+          frequency: 1,
+          lastUpdated: Date()
+        });
+      } else {
+        this.database.child(`terms/${term}`).update({
+          frequency: val.frequency + 1,
+          lastUpdated: Date()
+        });
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
   logConversation(ip) {
     if (!ip) return;
     try {
